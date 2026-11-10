@@ -62,7 +62,7 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 | Version | Changed Artifact | Hypothesis | Metric Before | Metric After | Run File |
 |---|---|---|---:|---:|---|
-| v0 | baseline |  |  |  |  |
+| v0 | baseline | Đo hành vi agent với prompt và tool declaration gốc | — | 0.25 (5/20 case) | `starter_v0/runs/v0_B_base_ollama_20261110T174716342985.json` |
 | v1 |  |  |  |  |  |
 | v2 |  |  |  |  |  |
 | v3 |  |  |  |  |  |
@@ -73,7 +73,21 @@ Lấy từ `results[*].result.failures` trong run JSON.
 
 | Case ID | Failure Type | Actual Tool Calls | What Failed | Fix |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| R01_user_tweets_routing | wrong_tool (quan sát: wrong_arg_value) | `timeline(screenname="Sam Altman", limit=1)` | `screenname` cần là `sama`, không phải tên đầy đủ. | Mô tả quy tắc đổi tên người thành handle. |
+| R03_web_news_routing | wrong_tool | `social_search(query="Tin tức AI hôm nay")` | Thiếu `lookup` cho tin web; gọi tìm mạng xã hội. | Phân biệt tin web với bài đăng mạng xã hội. |
+| R05_limit_arg | wrong_arg_value (quan sát: sai tool) | `social_search(query="Elon Musk", limit=10)` | Cần `timeline(screenname="elonmusk", limit=10)`. | Ưu tiên `timeline` khi hỏi bài đăng của tài khoản cụ thể. |
+| R06_timeframe_arg | wrong_arg_value (quan sát: sai tool) | `social_search(query="Tin công nghệ")` | Cần `lookup(topic="news", timeframe="week")`. | Nêu rõ quy tắc chọn `lookup` và ánh xạ khoảng thời gian. |
+| R08_out_of_scope | out_of_scope | `lookup(query="integrate x^2")` | Bài toán tích phân ngoài phạm vi; kỳ vọng không gọi tool. | Thêm ranh giới phạm vi của research agent. |
+| R10_missing_handle | missing_info | `social_search(query="tweet")` | Thiếu tài khoản nhưng agent tìm chung thay vì hỏi lại. | Gọi `clarify` khi chưa biết tài khoản cần xem. |
+| R11_missing_url | missing_info | `lookup(query="Tóm tắt bài viết này")` | Không có URL bài viết nhưng agent tự tìm. | Gọi `clarify` để xin URL trước khi đọc bài. |
+| R12_confirm_before_send | wrong_boundary | `send(text="Đăng bản tin này lên Telegram giúp mình")` | Gọi `send` trước khi người dùng xác nhận. | Bắt buộc `clarify(response_type="yes_no")` trước khi gửi. |
+| R13_parallel_web_and_tweets | wrong_tool | `social_search(query="AI")` | Thiếu `lookup` cho phần tin web; chỉ tìm bài đăng. | Cho phép gọi cả `lookup` và `social_search` khi yêu cầu cả hai nguồn. |
+| R14_out_of_scope_coding | out_of_scope | `lookup(query="Python Fibonacci recursion")` | Yêu cầu viết code ngoài phạm vi; kỳ vọng không gọi tool. | Nêu rõ các yêu cầu lập trình nằm ngoài phạm vi. |
+| M01_clarify_then_fill | missing_info | `social_search(query="Elon Musk", limit=5)` | Sau khi có tên tài khoản vẫn không gọi `timeline(screenname="elonmusk")`. | Dùng thông tin bổ sung ở lượt sau và ánh xạ handle. |
+| M02_carryover_timeframe | wrong_arg_value | `lookup(query="robotics", topic="general", timeframe="day")` | Giữ đúng `day` nhưng mất ngữ cảnh tin tức: cần `topic="news"`. | Giữ loại nguồn tin qua nhiều lượt. |
+| M03_correction_handle | wrong_arg_value | `timeline(screenname="Sam Altman", limit=3)` | Không áp dụng sửa đổi tài khoản; cần `karpathy`. | Ưu tiên thông tin người dùng vừa sửa ở lượt cuối. |
+| M05_correction_limit | wrong_arg_value | `timeline(screenname="elonmusk", limit=10)` | Không áp dụng số lượng mới; cần `limit=3`. | Lấy giới hạn mới nhất trong hội thoại. |
+| M06_switch_tool | wrong_tool | `social_search(query="OpenAI")` | Người dùng chuyển sang tin web nhưng agent tiếp tục tìm mạng xã hội. | Chọn lại tool theo yêu cầu mới nhất mỗi lượt. |
 
 ### B3. Team Eval Cases
 
