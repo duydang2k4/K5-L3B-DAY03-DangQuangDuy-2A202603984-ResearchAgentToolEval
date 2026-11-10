@@ -12,7 +12,7 @@
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
 |   1 |Bùi Thị Huyền Tâm|2A202603917|       |        |         |
-|   2 |        |      |       |        |         |
+|   2 |Mai Danh Hieu        |   2A202603948|       |        |         |
 
 ## Cá nhân
 
