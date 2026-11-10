@@ -64,7 +64,7 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 |---|---|---|---:|---:|---|
 | v0 | baseline | Đo hành vi agent với prompt và tool declaration gốc | — | 0.25 (5/20 case) | `starter_v0/runs/v0_B_base_ollama_20261110T174716342985.json` |
 | v1 | `system_prompt.md` (quy tắc xác nhận trước `send`) | Quy tắc rõ ràng sẽ chuyển R12 từ `send` sang `clarify`; thực tế R12 vẫn FAIL | 0.25 | 0.20 (4/20 case) | `starter_v0/runs/v1_B_base_ollama_20261110T180802788870.json` |
-| v2 |  |  |  |  |  |
+| v2 | `tools.yaml` (chỉ description của `send`) | Mô tả điều kiện xác nhận tại tool sẽ chuyển R12 sang `clarify`; thực tế R12 vẫn FAIL | 0.20 | 0.10 (2/20 case) | `starter_v0/runs/v2_B_base_ollama_20261110T181246575962.json` |
 | v3 |  |  |  |  |  |
 
 ### B2. Failure Analysis

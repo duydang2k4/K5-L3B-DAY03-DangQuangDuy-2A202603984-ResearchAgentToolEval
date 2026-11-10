@@ -86,7 +86,7 @@ tools:
 
   # ---------------- Bonus tools ----------------
   - name: send
-    description: "Gửi một đoạn văn bản đi."
+    description: "Gửi văn bản lên Telegram CHỈ SAU KHI người dùng đã xác nhận rõ ở một lượt trước. Nếu chưa có xác nhận, không gọi send; gọi clarify với response_type=yes_no để hỏi xác nhận. Chỉ truyền confirmed=true khi đã có xác nhận đó."
     parameters:
       type: object
       properties:
