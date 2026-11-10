@@ -11,9 +11,9 @@
 
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
-|   1|Đăng Quang Duy     |   2A202603984|       |        |         |
-|   2 |Bùi Thị Huyền Tâm|2A202603917|       |        |         |
-|   3 |Mai Danh Hiếu       |   2A202603948|       |        |         |
+|   1|Đăng Quang Duy     |   2A202603984|   dqduy4444@gmail.com    |    duydang2k4    |     Back-end    |
+|   2 |Bùi Thị Huyền Tâm|2A202603917|       |        |    Front-end     |
+|   3 |Mai Danh Hiếu       |   2A202603948|       |        |    Back-end     |
 
 ## Cá nhân
 
