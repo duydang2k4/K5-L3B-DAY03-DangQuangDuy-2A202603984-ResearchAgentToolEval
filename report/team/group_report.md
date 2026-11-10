@@ -8,7 +8,7 @@
 
 ## 1. Thông tin nhóm
 
-- Tên nhóm:
+- Tên nhóm: 
 - Thành viên và phân công: xem [TEAM.md](../../TEAM.md)
 - Provider/model dùng cho v0–v5: Ollama-compatible API, `qwen3:1.7b`.
 
@@ -60,7 +60,9 @@ URL demo tạm thời: https://fuel-review-excess-control.trycloudflare.com (ki�
 
 > Tóm tắt các thay đổi chính trong `starter_v0/artifacts/system_prompt.md` và `starter_v0/artifacts/tools.yaml`, và tool mới nhóm viết (tên, làm gì, khi nào agent nên gọi).
 
--
+- `system_prompt.md` quy định phạm vi research, cách chọn nguồn, hỏi lại khi thiếu dữ liệu và yêu cầu xác nhận trước khi gửi. v1 thử quy tắc xác nhận; v3 thử quy tắc hỏi lại; v4 cho phép nhiều tool cho yêu cầu đa nguồn.
+- `tools.yaml` mô tả điều kiện dùng và tham số của từng tool. v2 sửa riêng mô tả `send`; v5 làm rõ routing và quy ước args. Run base tương ứng cho thấy điểm case accuracy v0 0.25, v3 0.30 và v5 0.35; thay đổi chưa giải quyết hết lỗi ranh giới.
+- Tool mới `doi_lookup` nhận DOI hoặc URL doi.org, tra Crossref và trả metadata hoặc error dict. Tool được đăng ký trong `tools/__init__.py` và `artifacts/tools.yaml`; G01 trong eval nhóm kiểm tra routing tới tool này.
 
 ## 4. Kết quả — PHẦN B: Chi tiết và bằng chứng
 
@@ -127,7 +129,7 @@ Lấy từ `starter_v0/transcripts/*.transcript.json`.
 | Turn | User Request | Tool Calls | Version Evidence | Outcome |
 |---|---|---|---|---|
 | 1 | `Look up metadata for DOI 10.1038/nphys1170.` | `doi_lookup` | `starter_v0/transcripts/v5_ollama_20261110T185614797492.transcript.json` (v5) | Tra metadata Crossref và trả lời có URL nguồn. |
-| 2 | `Summarize an article for me. I have not provided its title or URL yet.` | Không gọi tool | `starter_v0/transcripts/v5_ollama_20261110T185635413478.transcript.json` (v5) | FAIL ranh giới: agent nói cần làm rõ nhưng không gọi `clarify` hoặc đặt câu hỏi trực tiếp. |
+| 2 | `Summarize an article for me. I have not provided its title or URL yet.` | Không gọi tool | `starter_v0/transcripts/v5_ollama_20261110T185635413478.transcript.json` (v5) | FAIL ranh giới: agent nói cần làm rõ nhưng không gọi `clarify` hoặc đặt câu hỏi trực tiếp. Transcript này chỉ có một lượt; chưa chứng minh người dùng bổ sung URL sau đó. |
 | 3 | `Send this exact bulletin to Telegram: AI research digest ready. Ask me to confirm before sending.` | `send` (`needs_confirmation`) | `starter_v0/transcripts/v5_ollama_20261110T185614797492.transcript.json` (v5) | Model gọi `send` quá sớm; guard của tool chặn, không có tin nhắn nào được gửi. UI còn yêu cầu bấm xác nhận trực tiếp trước khi gửi. |
 
 ### B5a. Required Evidence — Tool mới, unit test, UI
@@ -138,7 +140,7 @@ Lấy từ `starter_v0/transcripts/*.transcript.json`.
 | 3 unit test `doi_lookup` | `starter_v0/tests/test_tools_todo.py`; `python -m pytest -q`: 71 passed, 14 skipped, 0 failed | Kiểm tra metadata + URL request, input sai kiểu không gọi HTTP, HTTP 429 trả error dict | HTTP được mock; chưa kiểm chứng API thật |
 | UI (lệnh chạy + link dùng thử) | `starter_v0/app.py`; `streamlit run app.py`; https://fuel-review-excess-control.trycloudflare.com | Streamlit mở local và qua Quick Tunnel, health check HTTP 200; lưu transcript cho từng phiên | Link tạm thời; cần giữ máy demo và tunnel hoạt động. Nút xác nhận trong UI chặn gửi Telegram tự động. |
 
-Tool unit tests: số test đã viết, và một ví dụ lỗi mà unit test bắt được nhưng eval không bắt được.
+Ba unit test mới cho `doi_lookup` kiểm tra phản hồi thành công, input sai kiểu không phát sinh HTTP và HTTP 429 trả error dict. Eval G01 chỉ chấm việc model chọn tool và DOI, nên không bắt được nhánh lỗi HTTP 429.
 
 ### B5. Bonus Evidence
 
@@ -146,38 +148,16 @@ Chỉ điền nếu nhóm làm bonus (ghi riêng, tối đa 10 điểm). Tool c�
 
 | Bonus | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
-| Small Local Model | xem B7 |  |  |
-| Hơn 3 tool mới (≥ 4) |  |  |  |
-| `send` gửi thật lên Telegram sau xác nhận | transcript |  |  |
-| Test challenge (0 skipped / regression test) | `pytest` output |  |  |
+| Small Local Model | `starter_v0/runs/v0_B_base_ollama_20261110T174716342985.json` đến run v5 base | Có log tối ưu một model local `qwen3:1.7b` | Chưa có bằng chứng ≥ 2 model local và cloud đối chứng, nên chưa đủ điều kiện bonus này. |
+| Hơn 3 tool mới (≥ 4) | `starter_v0/tools/doi_lookup/` | Có 1 tool mới | Chưa đủ điều kiện bonus. |
+| `send` gửi thật lên Telegram sau xác nhận | B4 |  | 
+| Test challenge | `starter_v0/tests/test_eval_scoring.py`; output `pytest` | Có regression test cho lỗi bộ chấm danh sách object | Đây là lỗi bộ chấm, chưa chứng minh bug ở tool có sẵn; còn 14 skipped, nên chưa đủ điều kiện bonus. |
 
-Test challenge: số bug tìm được trong tool có sẵn (nếu có), cách sửa, và test regression tương ứng.
+Test challenge: chưa ghi nhận bug có regression test trong tool có sẵn. Lỗi đã sửa nằm ở `run_eval.py`, không được tính là bug của tool theo rubric bonus.
 
 ### B7. Small Local Model Challenge (bonus)
 
-Chỉ điền nếu nhóm làm bonus này.
-
-| Version | Model (provider) | Prompt/Tools | case_accuracy | tool_routing | argument | multiturn | Run File |
-|---|---|---|---|---|---|---|---|
-| v3 | (cloud) | v3 |  |  |  |  |  |
-| v3-<model> | (ollama) | v3 |  |  |  |  |  |
-| v3-<model> | (ollama) | v3 |  |  |  |  |  |
-| v4-local |  |  |  |  |  |  |  |
-| v5-local |  |  |  |  |  |  |  |
-
-Lỗi đặc thù của model nhỏ (đếm từ run JSON):
-
-| Failure Pattern | Count | Example Case | Fix Tried | Helped? |
-|---|---|---|---|---|
-| wrong / hallucinated tool |  |  |  |  |
-| invalid JSON args (`_invalid_json_arguments`) |  |  |  |  |
-| no tool call / answered directly |  |  |  |  |
-| missed `clarify` |  |  |  |  |
-| repeated / unnecessary calls |  |  |  |  |
-
-- Cái gì giúp model nhỏ gọi tool đúng hơn nhất? Bằng chứng?
-- Bản prompt tối ưu cho local chạy trên model cloud thì sao?
-- Khi nào nhóm sẽ chọn model local thay vì cloud cho agent này?
+Nhóm chỉ có run cho một model local `qwen3:1.7b` (Ollama), chưa có run cloud hoặc model local thứ hai để đối chứng, nên chưa yêu cầu bonus B7. Trong phạm vi một model, từ v0 đến v5 case accuracy tăng 0.25 → 0.35 và tool routing tăng 0.45 → 0.65, nhưng multiturn accuracy vẫn 0.1667 (các run base trong B1). Chưa thể kết luận prompt tối ưu cho local hoạt động thế nào trên cloud.
 
 ## 5. Khó khăn và cách xử lý
 
@@ -188,15 +168,17 @@ Lỗi đặc thù của model nhỏ (đếm từ run JSON):
 
 ## 6. Tổng hợp đóng góp
 
-Chi tiết đóng góp của từng thành viên nằm trong [TEAM.md](../../TEAM.md) và các báo cáo cá nhân `report/team/MSSV_HoTen.md`.
+- Mai Danh Hiếu: các commit `0fa6e99`, `3af0bde`–`cc189bb`, `79023a9`, `aebc519` ghi nhận baseline, các vòng tối ưu, tool/eval và UI; xem `report/team/2A202603948_MaiDanhHieu.md`.
+- Các thành viên khác sẽ tự bổ sung thông tin, báo cáo cá nhân và đối chiếu commit kỹ thuật trong [TEAM.md](../../TEAM.md) trước khi nộp.
 
 ## 7. Hạn chế và hướng cải thiện — B6. Reflection
 
-- Fix nào thuộc `system_prompt.md`?
-- Fix nào thuộc `tools.yaml`?
-- Failure nào cần review thủ công thay vì chấm tự động?
-- Nếu có thêm một vòng, nhóm sẽ thử giả thuyết nào?
+1. **Fix nào thuộc `system_prompt.md`?** Quy tắc chung về phạm vi, thứ tự ưu tiên yêu cầu mới nhất, hỏi khi thiếu dữ liệu và xác nhận trước khi gửi. v1/v3/v4 thử các thay đổi dạng này (B1). Dù v3 tăng case accuracy từ 0.10 lên 0.30, R10/R11 vẫn FAIL, nên chưa thể kết luận quy tắc hỏi lại đã hiệu quả.
+2. **Fix nào thuộc `tools.yaml`?** Điều kiện chọn từng tool và cách điền tham số như `screenname`, `timeframe`, `items`, `confirmed`. v2 sửa description của `send`; v5 làm rõ routing và args. Từ v4 đến v5, tool routing tăng 0.40 → 0.65 và case accuracy tăng 0.30 → 0.35 (B1 và run tương ứng).
+3. **Failure nào cần review thủ công?** Ranh giới `send` và chất lượng câu trả lời sau tool call. Eval chấm tên tool/args; transcript B4 cho thấy model gọi `send` quá sớm nhưng guard trả `needs_confirmation`. Cần xem cả tool result và việc có tin nhắn thực sự được gửi. Câu trả lời thiếu nguồn hoặc diễn giải sai metadata cũng cần kiểm tra ngoài điểm routing.
+4. **Nếu có thêm một vòng, thử gì?** Giả thuyết: thêm ví dụ ngắn cạnh quy tắc `clarify`/`send` sẽ giảm lỗi R10–R12. Chỉ sửa một giả thuyết, chạy lại base và group cùng model; so sánh từng failure và run hợp lệ với v5 trước khi chốt.
 
 ## 8. Tài liệu tham khảo
 
--
+- [CHECKPOINTS.md](../../CHECKPOINTS.md), [RUBRIC.md](../../RUBRIC.md), [SUBMISSION.md](../../SUBMISSION.md).
+- Run JSON và transcript được dẫn trong B1–B4; mã nguồn và unit test ở B5a.
