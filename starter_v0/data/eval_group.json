@@ -3,5 +3,14 @@
   "dataset_role": "group",
   "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
   "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "cases": [
+    {
+      "id": "G01_lookup_exact_doi",
+      "phase": "B",
+      "query": "Tra thông tin bài báo có DOI 10.1038/nphys1170: tên bài, tác giả và năm xuất bản.",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "doi_lookup", "args": {"doi": "10.1038/nphys1170"}}]},
+      "metadata": {"what_it_tests": "DOI cụ thể phải route tới doi_lookup, không tìm paper theo từ khóa."}
+    }
+  ]
 }

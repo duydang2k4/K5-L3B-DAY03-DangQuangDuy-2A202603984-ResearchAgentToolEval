@@ -37,7 +37,7 @@ Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc 
 | Tên tool | Làm được gì | Tool mới nhóm thêm? |
 |---|---|---|
 | clarify | hỏi lại người dùng khi thiếu thông tin | không |
-|  |  |  |
+| doi_lookup | tra metadata bài báo theo DOI qua Crossref | có |
 |  |  |  |
 
 ### A3. Câu hỏi mẫu để thử
@@ -66,6 +66,10 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 | v1 | `system_prompt.md` (quy tắc xác nhận trước `send`) | Quy tắc rõ ràng sẽ chuyển R12 từ `send` sang `clarify`; thực tế R12 vẫn FAIL | 0.25 | 0.20 (4/20 case) | `starter_v0/runs/v1_B_base_ollama_20261110T180802788870.json` |
 | v2 | `tools.yaml` (chỉ description của `send`) | Mô tả điều kiện xác nhận tại tool sẽ chuyển R12 sang `clarify`; thực tế R12 vẫn FAIL | 0.20 | 0.10 (2/20 case) | `starter_v0/runs/v2_B_base_ollama_20261110T181246575962.json` |
 | v3 | `system_prompt.md` (chỉ đoạn xử lý thông tin thiếu) | Quy tắc hỏi khi thiếu dữ liệu sẽ cải thiện R10/R11; thực tế cả hai vẫn FAIL | 0.10 | 0.30 (6/20 case) | `starter_v0/runs/v3_B_base_ollama_20261110T181731243247.json` |
+| v4 | `system_prompt.md` (bỏ ép một bước, một tool) | Cho phép nhiều tool sẽ xử lý yêu cầu đa nguồn; R13 vẫn FAIL | 0.30 | 0.30 (6/20 case) | `starter_v0/runs/v4_B_base_ollama_20261110T182735871967.json` |
+| v5 | `tools.yaml` (mô tả cách dùng và args) | Khai báo rõ sẽ cải thiện routing/args; routing accuracy tăng 0.40 → 0.65 | 0.30 | 0.35 (7/20 case) | `starter_v0/runs/v5_B_base_ollama_20261110T183009801568.json` |
+
+Giữa v3 và v4, nhóm đã thêm tool `doi_lookup` vào `tools.yaml`; vì vậy so sánh v3→v4 có thêm thay đổi ở tập tool. So sánh v4→v5 giữ nguyên prompt và danh sách tool, chỉ thay mô tả/arg convention.
 
 ### B2. Failure Analysis
 
@@ -109,8 +113,8 @@ Lấy từ `starter_v0/transcripts/*.transcript.json`.
 
 | Item | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
-| Tool mới (`tools/<tên>/`) |  |  |  |
-| Unit test tool mới (≥ 3 test/tool) | `pytest` output (0 failed) |  |  |
+| Tool mới `doi_lookup` | `starter_v0/tools/doi_lookup/tool.py`, `TOOL.md`, `tools/__init__.py`, `artifacts/tools.yaml` | Nhận DOI hoặc URL doi.org và trả metadata Crossref; có case `G01_lookup_exact_doi` trong `data/eval_group.json` | DOI sai hoặc lỗi HTTP trả error dict, không raise |
+| 3 unit test `doi_lookup` | `starter_v0/tests/test_tools_todo.py`; `python -m pytest -q`: 70 passed, 14 skipped, 0 failed | Kiểm tra metadata + URL request, input sai kiểu không gọi HTTP, HTTP 429 trả error dict | HTTP được mock; chưa kiểm chứng API thật |
 | UI (lệnh chạy + link dùng thử) |  |  |  |
 
 Tool unit tests: số test đã viết, và một ví dụ lỗi mà unit test bắt được nhưng eval không bắt được.

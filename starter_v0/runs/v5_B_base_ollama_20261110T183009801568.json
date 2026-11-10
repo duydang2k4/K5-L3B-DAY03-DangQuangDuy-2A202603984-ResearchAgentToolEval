@@ -1,0 +1,1688 @@
+{
+  "run_id": "v5_B_base_ollama_20261110T183009801568",
+  "version": "v5",
+  "artifact_version": "v5+pa1ca32f6dff8+tf073692ef964",
+  "prompt_hash": "a1ca32f6dff84739809d018d40bea28bbcdda578e8d4dfaf52db7fce0a1028f3",
+  "tools_hash": "f073692ef964c687dfbe6d684bcd95bc649fcfa53ab85ab6ed7cb8d817c4edb0",
+  "phase": "B",
+  "suite": "base",
+  "provider": "ollama",
+  "model": "qwen3:1.7b",
+  "system_prompt": "D:\\WORKSPACE\\K5-L3B-DAY03-DangQuangDuy-2A202603984-ResearchAgentToolEval\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "D:\\WORKSPACE\\K5-L3B-DAY03-DangQuangDuy-2A202603984-ResearchAgentToolEval\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_base.json",
+  "dataset_id": "day03_v2_research_base",
+  "dataset_role": "base",
+  "description": "Core eval cho research agent: routing đúng tool + đúng args, hỏi lại khi thiếu (ask_user), xác nhận trước khi gửi, và xử lý câu ngoài phạm vi / không cần tool. Chấm trên tool_calls + args (subset). KHÔNG sửa file này — chỉ thêm case vào eval_group.json.",
+  "generated_at": "2026-11-10T18:30:09",
+  "summary": {
+    "total_cases": 20,
+    "measured_cases": 20,
+    "provider_error_cases": 0,
+    "passed_cases": 7,
+    "case_accuracy": 0.35,
+    "tool_routing_accuracy": 0.65,
+    "argument_accuracy": 0.35,
+    "multiturn_accuracy": 0.1667,
+    "failure_counts": {
+      "wrong_tool": 4,
+      "wrong_arg_value": 5,
+      "missing_info": 3,
+      "wrong_boundary": 1
+    },
+    "observed_mismatch_counts": {
+      "wrong_arg_value": 7,
+      "missing_tool_call": 6
+    }
+  },
+  "results": [
+    {
+      "id": "R01_user_tweets_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_user_tweets_name_to_handle",
+        "difficulty": "medium",
+        "what_it_tests": "Tin CỦA một người nổi tiếng → map tên Sam Altman thành handle sama rồi gọi get_user_tweets."
+      },
+      "input": "Tweet mới nhất của Sam Altman là gì?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "sama"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "Sam Altman",
+              "limit": 5
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "screenname: expected 'sama', got 'Sam Altman'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "Sam Altman",
+            "limit": 5
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "JSONDecodeError",
+            "message": "Expecting value: line 1 column 1 (char 0)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "R02_search_tweets_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_search_tweets",
+        "difficulty": "easy",
+        "what_it_tests": "Tweet theo CHỦ ĐỀ → search_tweets, không phải get_user_tweets."
+      },
+      "input": "Mọi người đang bàn gì về GPT-5 trên Twitter?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "GPT-5",
+              "search_type": "Latest"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "GPT-5",
+            "search_type": "Latest"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "GPT-5",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "30 Websites That Feel \"Illegal\" But Are Perfectly Legal",
+                "summary": "30 Websites That Feel \"Illegal\" But Are Perfectly Legal\n\n1. https://t.co/4m9jsuY1Nm — Free unlimited AI image generation, quality rivals Midjourney\n\n2. https://t.co/x3zdWR2FrR — Real-time AI image generation, draws as you go\n\n3. https://t.co/NiiI34uQRO — AI unlimited image upscaling, details auto-filled\n\n4. https://t.co/8C7NQLyHNP — AI one-click background removal/lighting fix/erasure\n\n5. https://t.co/mCKkIsGkqP — AI voice cloning, mimics any voice in 5 seconds\n\n6. https://t.co/Ltw2g9ph9p — Input lyrics to auto-generate full songs\n\n7. https://t.co/eowMnYmJxH — AI video generation pioneer, free Gen-3 trial\n\n8. https://t.co/cQveRWNrM3 — Kuaishou Keling AI, smoothest Chinese video generation\n\n9. https://t.co/OIjaygQMGH — One photo + one audio clip = talking digital human\n\n10. https://t.co/LBJRFOMjVx — Turns static photos into talking videos\n\n11. https://t.co/ejGgiNPpIa — AI code writing, free quota enough for daily use\n\n12. https://t.co/dNNAgtk8yN — Build websites by talking, zero code\n\n13. https://t.co/uO41ORdkPY — Vercel AI frontend generator, description becomes page\n\n14. https://t.co/rkndNGymLR — Code in browser + AI assistance + one-click deploy\n\n15. https://t.co/Vc6kumwRlc — Paste text to auto-generate infographics\n\n16. https://t.co/wb0QlmcJpT — AI one-click PPT generation, say goodbye to PPT hell\n\n17. https://t.co/d3ezq5EU7x — Notion AI for writing, summarizing, translating\n\n18. https://t.co/TN3O5KrLTz — Sketch a drawing, AI generates real webpage\n\n19. https://t.co/cgdjvEpfrM — AI search engine, answers any question instantly + sources\n\n20. https://t.co/tYnAdKS0qK — Developer-exclusive AI search, code issues solved on search\n\n21. https://t.co/UoyRkaWs0d — Real-time meeting transcription, free 300 minutes monthly\n\n22. https://t.co/12p1BCw3B3 — AI short video editing, auto-finds highlight clips\n\n23. https://t.co/IcJbEOA0Ac — One site to use GPT-4o / Claude / Gemini\n\n24. https://t.co/v4zKhc7M3n — Open-source AI model free playground\n\n25. https://t.co/OxndbqhgZj — One-click AI background removal, 1-second output\n\n26. https://t.co/JovWTlX9WW — AI erases any object from photos\n\n27. https://t.co/VS3KA2xxml — AI face swap, 1-minute turnaround\n\n28. https://t.co/DRV82Ka3Dq — AI music tagging + recommendations\n\n29. https://t.co/MwzRlYjISk — AI writing assistant, free version enough for daily use\n\n30. https://t.co/Hsra85hK9R — Anthropic free AI assistant, top-tier long-text handling\n\nFollow @AaronScottAI for more tips.",
+                "url": "https://x.com/AaronScottAI/status/2120114996474695720",
+                "source": "@AaronScottAI",
+                "date": "Tue Nov 10 11:22:59 +0000 2026",
+                "metrics": {
+                  "favorites": 2,
+                  "retweets": 2,
+                  "views": "33"
+                }
+              },
+              {
+                "title": "Chat GPT Plus🪸",
+                "summary": "Chat GPT Plus🪸\n\n07 วัน 𓏔 50 บาท\n┈┈┈┈┈┈┈\n30 วัน 𓏔 179 บาท ⚠️\n꒰ รีnวิตเหลือ 109 บาท ꒱\n\nเมลร้าน หาร5 เมลปิดรับเคลม\nโมเดล GPT5,GPT4o,GPT6.6\n\nสั่งซื้อ ➡️ https://t.co/taYzZ8AbDh\n “thx u for Oder”\n\n#หารchatgpt #หารแชทจีพีที \n#หารchatgptplus นจกแำยำบ https://t.co/KRRKkjT2su",
+                "url": "https://x.com/memeuaing/status/2120113816268943522",
+                "source": "@memeuaing",
+                "date": "Tue Nov 10 11:18:18 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "22"
+                }
+              },
+              {
+                "title": "Formalizing inverse problems in the age of AI: possibilities, pitfalls, and an invitation : https://t.co/OSigO2kWfe",
+                "summary": "Formalizing inverse problems in the age of AI: possibilities, pitfalls, and an invitation : https://t.co/OSigO2kWfe\n\n\"04 Nov 2026\n\\useosfFormalizing inverse problems in the age of AI: possibilities, pitfalls, and an invitation\nChristian ClasonUniversity of Graz, AustriaTapio HelinLUT University, FinlandMedet NursultanovAI University, KazakhstanLauri OksanenUniversity of Helsinki, FinlandWork in progress — November 4, 2026Abstract\nProof assistants such as Lean 4 check mathematical proofs down to the axioms, and AI agents have recently made writing such proofs cheap. We describe AutoIP, a Lean 4 library in which classical linear regularization theory, together with the functional analysis it rests on, has been autoformalized by AI agents. A machine-checked proof certifies only the formal statement it proves, so the remaining human task is to confirm that each formal statement says what was intended. We organize the library around this task: a reviewer compares the formal statements with their natural-language counterparts and never needs to read a proof. Our experience is that the risks lie in the statements rather than in the proofs, and that simple automated tests on the statements can expose problems even in the established literature. We illustrate this with a textbook theorem whose hypothesis is more restrictive than asserted. We invite the inverse problems community to extend and build on the library.Keywords: formal verification, proof assistants, Lean, autoformalization, regularization theory, ill-posed problems, artificial intelligence\n1Introduction\nOn 6 October 2026, OpenAI published more than seven hundred mathematical manuscripts, all produced by an unreleased internal model [22]. A substantial number, though fewer than half, of the released results come with a formal proof checked by Lean [12, 13]. Formal proof used to be very expensive. In 2008, Georges Gonthier wrote on the four color theorem that formalizing the infamously large case analysis in its proof was the easy part, done in a few part-time months, while certain graph-theoretic arguments “took a few years to sort out” [15]. According to OpenAI, an average result took about three hours of computation. The numbers cannot be compared directly. Not every result of OpenAI was formalized, but the three hours also include finding the proof, which is usually the harder task. Even with these caveats, the cost of a formal proof has fallen by orders of magnitude.Appel and Haken’s original proof of the four color theorem in 1976 is often viewed as the first major theorem whose proof no human could verify by hand. It is a reduction to almost two thousand configurations that were checked by a computer program [2, 3]. At the time, philosophers asked whether such an argument was a proof at all [30]. Accepting the original proof of the four color theorem meant trusting a custom program written for that one purpose. Formal proof offers a way around this. The idea goes back to John McCarthy in 1962 [19]: write the proof in a language precise enough that a single, small, general-purpose program can check every step. A number of systems followed, including Automath (1967) [10, 11], LCF (1972) [20], and later Coq [9] and Lean, among others.The correctness of a formal proof does not depend on any code written specifically for that proof. All trust rests on the proof checker, which is shared by all its users and has been examined by them for years. In other words, trust is moved out of each individual proof and into one piece of common infrastructure, and the correctness of a proof does not require a review. What still requires review is the statement: the checker certifies that a proof establishes its formal statement, not that the formal statement expresses the intended mathematics. This is the main subject of the present paper.The current technology-driven crisis in mathematics appears more profound than the controversy around Appel and Haken’s proof in the 70s. AI systems now produce results at a volume that human refereeing cannot match, and the question of trust that the four color theorem raised for a single proof now arises for whole bodies of work. Nonetheless, we expect that formalization will become an increasingly important tool, since its cost has collapsed. Agents based on openly available frontier models can already formalize mathematics automatically with relative ease [4]. Such automatic formalization is often called autoformalization [31, 32].While it is unknown according to which principles OpenAI decided what to formalize, a potential deciding factor could have been the size of the gap between already formalized theory and that required by a result. In the present paper we address this gap within the field of inverse problems. We describe AutoIP, a Lean library of autoformalized results in linear regularization theory. Shared libraries not only speed up the formalization process but also save computational resources by eliminating overlapping work. Inverse problems are a natural field for such a library. The classical theory rests on functional analysis that is largely available in Mathlib, and it is now being extended rapidly by learned and data-driven regularization methods. Convergence guarantees for such methods are new and less scrutinized theory, where we would expect formalization to find more issues of the kind we report in Section 5.4 in the settled classical https://t.co/ca3TWK7vsF formalization may change how applied mathematics is done. An applied inverse problem is usually studied piece by piece: uniqueness and stability, regularization, discretization, convergence of the numerical method and the model of the noise are treated in separate papers, often under assumptions that do not quite fit together. A formal library can hold such pieces in one place and check that the conclusions of one match the assumptions of the next. This makes large projects feasible that follow an applied problem from its mathematical model to guarantees for the algorithm that solves it. Much of the work such projects require, for example tracking constants, checking that every case is covered, or verifying that a known result carries over to a slightly different setting, is tedious and often simply not done. This is the kind of work that can now be delegated to AI agents, while people decide what should be proved and check that it was.\n1.1Reviewing formal libraries\nWe hope that AutoIP serves as an invitation for the inverse problems community to build and manage a formalized library of results specific to the field. While such results could in principle be incorporated in Lean libraries of general mathematics, there are benefits in keeping the review process within the community. The two existing general libraries, Mathlib [24] and Tau Ceti [27], sit at opposite ends of a spectrum regarding the review process.Most formalization in Lean 4 builds on Mathlib, a large library of formalized mathematics maintained by its community under human review. It covers much of the standard curriculum, including the parts of functional analysis that the theory of inverse problems rests on. Human reviewers of Mathlib not only attest the correctness of statements but also judge the quality of proofs. The review process is slow.Tau Ceti builds on Mathlib and adds formalized mathematics on top of it at great speed. The speed comes from leaving the review to AI agents. They check each contribution, including whether its statements and definitions say what they should, against roadmaps and review rubrics written by humans.We propose a middle ground where the correspondence of statements is attested by human reviewers, but proofs are not read.\n2The AutoIP library\n\n2.1Relation to Mathlib and Tau Ceti\nMuch of the functional-analytic material in Part I of AutoIP is available in Mathlib. When Mathlib already contains a result, AutoIP has no statement of its own but a citation to Mathlib. It is thereby also an index into the part of Mathlib the theory rests on.T​B​T=T,B​T​B=B,(T​B)∗=T​B,(B​T)∗=B​T.(1)The operator-theoretic infrastructure on top of Mathlib has recently grown quickly in Tau Ceti. Its relevant human-written roadmap is Polar decomposition: functional calculus, the operator modulus, and singular systems [26]. Within a few days in October 2026, Tau Ceti merged several formalized results outlined in the roadmap, including the Moore–Penrose inverse [25]. For maps T:X→Y and B:Y→X between finite-dimensional inner product spaces, B is the Moore–Penrose inverse of T if and only if it satisfies the four Penrose equationsThis material was largely imported from an existing formalization developed at Kitware [17]. The Moore–Penrose inverse and singular systems of Tau Ceti are, however, finite-dimensional objects, with one exception: uniqueness under the Penrose equations (1) is proved in arbitrary inner product spaces. In particular, Tau Ceti represents a Moore–Penrose inverse as an everywhere-defined linear map. This form only covers operators with closed range, so it cannot express the ill-posed case.AutoIP formalizes the infinite-dimensional theory needed in inverse problems. It contains a singular system {(σn,vn,un)} for every compact operator K between Hilbert spaces, with σn nonincreasing and σn→0 when there are infinitely many, and the expansion K​x=∑nσn​⟨vn,x⟩​un. It also contains the Moore–Penrose inverse T† of a bounded operator, given as a partially defined linear map on ℛ⁡(T)⊕ℛ​(T)⟂ that sends y to the minimum-norm least-squares solution of T​x=y. Around it, AutoIP includes the classical result that T† is bounded exactly when ℛ⁡(T) is closed, the non-closed case being the one of interest to inverse problems. The definitions in AutoIP and Tau Ceti can be connected, of course. In the closed-range case, the operator T† of AutoIP satisfies the Penrose equations (1), so by uniqueness it coincides with Tau Ceti’s Moore–Penrose inverse wherever both are defined.\n2.2Scope\nAutoIP builds the regularization theory on top of functional analysis. At the time of writing, this theory has no overlap with Mathlib or Tau Ceti and Table 1 summarizes the size of the library. The contents follow the structure of the linear part of the lecture notes [8], which reorganize classical material from [14, 16]. They cover the Moore–Penrose inverse, source conditions, parameter choice rules, convergence rates and order optimality, spectral, Tikhonov and Landweber regularization, and discretization as regularization. Four further chapters, drawing more extensively on [14, 18], add general source conditions, iterated Tikhonov and semi-iterative methods, perturbed operators, and the balancing principle. The material is settled, and it rests on Hilbert space theory that is largely in Mathlib, so the gap to existing formalized mathematics is small.There are many ways to extend the library. They naturally include nonlinear problems as well as modern topics such as variational regularization in Banach spaces and statistical or machine-learning-based approaches to inverse problems. Some of these topics need foundations from other areas, such as convex analysis or statistics, that do not naturally belong in AutoIP but are not yet available (to the required extent) in Mathlib.Table 1:Size of AutoIP.Definitions51   cited from Mathlib14   predicates15   constructions22    reviewed by an author22Theorems73   cited from Mathlib22   stated in Lean51    reviewed by an author25Lemmas / corollaries / propositions83 / 16 / 5Lean files (library / tests)523 / 152Lines of Lean (library / tests)22 312 / 13 250Non-vacuity obligations503\n\n3Organization of the library\nLean checks that proofs establish the formal statements they are attached to. It does not attest that the statements say what was intended. Our review model asks a person to read the formal statement against the informal one, and the architecture of AutoIP is organized around it: a minimal, fixed set of files is designated for reading, and everything else is arranged so that it need not be read unless the reviewer is interested in the particulars of the proofs. A formalization aimed at one main result has one statement to compare, together with the definitions it uses. In the formalization of Fermat’s Last Theorem [1], for example, the final statement is compared with the one stated in Mathlib, which unfolds to four lines of definitions. A library has no main result. Each definition and each theorem is a deliverable, and each has to be compared with its informal counterpart.The natural language statements are given in an ordinary LaTeX document, which we call the blueprint and whose definitions, lemmas, and theorems we call nodes. Each node corresponds to one Lean file, its specification, at a path determined by the position of the node in the blueprint. The specification contains the formal statement of the node and no other statements. A reader attesting the correctness of the formalized statements works from the PDF of the blueprint and goes from a node to its specification. The remaining Lean files of the library are not part of what they read. A companion extension for Visual Studio Code [21] supports this workflow. A click on the label of a node in the blueprint source opens its specification, and a key binding in a Lean file shows the corresponding statement in the PDF. Together with the Lean extension, which follows the citations of Mathlib in the specifications, the reader can move between the blueprint, the formal statements and Mathlib without searching.Figure 1 shows a node and its specification. Let K∈ℒ⁡(X,Y) be compact, with singular system {(σn,vn,un)}n∈I, and let κ:=‖K‖2. A function φ that is bounded on [0,κ] defines a bounded operator on X byφ⁡(K∗​K)​x:=∑n∈Iφ⁡(σn2)​⟨vn,x⟩​vn+φ⁡(0)​P𝒩⁡(K)​https://t.co/rpo5A0KxBh P𝒩⁡(K) is the orthogonal projection onto the kernel of K. A family of such functions {φα}α>0, called a filter, defines the spectral regularization Rα:=φα​(K∗​K)​K∗, so that Rα​y=∑nφα​(σn2)​σn​⟨un,y⟩​vn. The Tikhonov filter is φα​(λ):=(λ+α)−1. The node of Fig. 1 states that Rα​y is the unique solution of the regularized normal equation.Figure 1:A node of the blueprint (top) and the formal statement in its specification (bottom). The proof is omitted. In the Lean code listings of this paper, 𝕜 is the scalar field, ℝ or ℂ, and E and F are the Hilbert spaces X and Y. Here hs is the singular system of K, α : Set.Ioi (0 : ℝ) is a parameter α>0, and spectralReg hs tikhonovFilter _ α y is Rα​y. Its third argument is a proof that the Tikhonov filter is bounded on [0,κ], which the functional calculus requires. On the right-hand side of the equivalence, K.adjoint ∘L K is K∗​K and https://t.co/HkWieDrsJy 𝕜 E is the identity on X.\nLemma (Tikhonov solves a regularised normal equation). Let y∈Y and α>0. For x∈X one has x=Rα​y if and only if (K∗​K+α​Id)​x=K∗​y.theorem tikhonov_iff_normal (hs : IsSingularSystem K σ v u) {α : Set.Ioi (0 : ℝ)}(y : F) (x : E) :x = spectralReg hs tikhonovFilter (tikhonovFilter_exists_bound_on_spectrum hs) α y ↔(K.adjoint ∘L K + ((α : ℝ) : 𝕜) ∙ https://t.co/HkWieDrsJy 𝕜 E) x = K.adjoint yThe choice of organization was inspired by the formalization of Fermat’s Last Theorem. This was carried out on Prove2Me [7], which uses separate files for each statement. There the separation serves compilation speed and the coordination of many agents, and trust rests on the final statement. In AutoIP it also serves the reader. A similar architecture is used by the recent formalization harness Trellis [29].A critical part of a formalization effort is the choice of definitions. In Lean, definitions are often constructive, and mathematically equivalent constructions can differ greatly in how usable they are. For this reason, AutoIP refers to concrete constructions only locally, and uses them globally via characterizing properties. This is enforced by the module system of Lean, which separates what a file exports from what it uses internally. A file that imports a definition sees its name and type but, unless the definition is explicitly exposed, not its body. In AutoIP only one file per node, its API11Shorthand for application programming interface. holding the characterizing properties, imports the specification with access to the bodies. Every other node sees the definition only through those properties.\n4How the work was carried out\nThe blueprint was written by the authors, its statements following [8, 14], and the Lean code was written by AI agents. The first round of autoformalization was carried out with few instructions beyond the blueprint itself. Reviewing its outcome afterwards led to several rounds of restructuring, some of which are described in the next section. Our working method grew out of those rounds and was not in place during the first one. We compare it with the workflow of Armstrong [4] in Section 6. As far as possible, our practices are implemented as programmatic checks. For example, the files of the library must follow the organization outlined in Section 3, no axioms can be introduced, and no unused code is allowed to remain. An agent works until these checks pass.What no program can check is recorded instead. For each node, a record states whether its specification says what the node says, and whether this was read by an author or by an agent. For each constructive definition, the agent records why it chose its construction over the alternatives, and an author approves or rejects the choice. A rejection or a mismatch stands until the text it objects to changes. Each record carries hashes of the informal and the formal statement it was written about, and of everything these rest on: the nodes the prose refers to and the definitions the formal statement uses. Formal statements use a hashing scheme similar to that of Trellis [29]. When either hash changes, the record expires and the node is marked for a new reading, while a change of a proof leaves the record intact. This made the repeated restructuring affordable, since the records showed exactly which statements had to be read again.\n5Lessons learned\n\n5.1Delimiting nodes is helpful\nOur first attempt at organizing the results in AutoIP took the shape of a conventional library, inspired by Mathlib, with formalizations of distinct nodes sharing a file. Thus the set of statements that required comparison was not delimited. Such organization made attestation of the correspondence between informal and formal statements cumbersome for us. Moreover, reviews by successive AI agents disagreed. For instance, GPT-5.6 Sol reviewed the library against slightly adapted22Tau Ceti uses the rubrics for agentic review of single pull requests. We adapted them to library-wide review. code-quality (generality, API design, naming, placement, proof quality, documentation and reuse) rubrics of Tau Ceti [28] and raised about 300 objections. Claude Opus 5, the model that wrote the code, acted on slightly over half of them and rejected the rest of the findings. When Claude Opus 5 then reviewed the material against the same rubrics, it raised more than 450 new objections. We stress that the model objected to the already revised code written by the same model in a separate session.The reviews of correspondence between formal and informal statements were more stable but not settled: Claude Opus 5 judged 17 of the 224 nodes of the library at that time a mismatch. After the restructuring into the organization described above, three rounds of such reviews by Claude Opus 5.5 covered between 205 and 229 nodes each and found a single mismatch in total. (The number of nodes varies because the library changed between the rounds and one round did not cover all of it.) We attribute the improvement in part to the restructuring, which gave each review a delimited task, although the change of model may also have contributed.\n5.2Junk values are dangerous\nEvery function in Lean is total. A function that is meaningful only on part of its natural domain must still return a value elsewhere, and Mathlib returns an arbitrary value, often called a junk value. For example, Modul...\"",
+                "url": "https://x.com/arnaudmercier/status/2120113343901913253",
+                "source": "@arnaudmercier",
+                "date": "Tue Nov 10 11:16:25 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "28"
+                }
+              },
+              {
+                "title": "Who's actually on top right now:",
+                "summary": "Who's actually on top right now:\n1. GPT-6.2 Sol\n2. DeepSeek V4.1\n3. Grok 4.7\n4. Gemini 4 Carbon\n5. Claude Fable 5.2\nWhich one gets your money?",
+                "url": "https://x.com/itsvlady/status/2120112550310453677",
+                "source": "@itsvlady",
+                "date": "Tue Nov 10 11:13:16 +0000 2026",
+                "metrics": {
+                  "favorites": 1,
+                  "retweets": 0,
+                  "views": "96"
+                }
+              },
+              {
+                "title": "@EdenBitton7 Depends how big your tasks are, ya mate. Plus Codex is 15 to 160 per 5 hours on GPT-6.1 Sol and 350 to 3,00",
+                "summary": "@EdenBitton7 Depends how big your tasks are, ya mate. Plus Codex is 15 to 160 per 5 hours on GPT-6.1 Sol and 350 to 3,000 on GPT-6 Luna, and the vendor calls those estimates. Pro $200 lists no five-hour limit, so it's for people who keep hitting that wall.",
+                "url": "https://x.com/Clevernesspc1/status/2120111903620084068",
+                "source": "@Clevernesspc1",
+                "date": "Tue Nov 10 11:10:42 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "3"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R03_web_news_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_web_news",
+        "difficulty": "medium",
+        "what_it_tests": "Tin thời sự trên web → web_search topic=news, timeframe=day (hôm nay)."
+      },
+      "input": "Tin tức AI hôm nay có gì nổi bật?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "timeframe": "day",
+              "topic": "general"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "topic: expected 'news', got 'general'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "AI",
+            "timeframe": "day",
+            "topic": "general"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AI",
+            "topic": "general",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "Artificial intelligence",
+                "url": "https://www.dw.com/en/artificial-intelligence/t-42133476",
+                "source": "dw.com",
+                "summary": "1. Skip to content\n2. Skip to main menu\n3. Skip to more DW sites\n\nIn focus\n\nCOP31Ukraine warAI\n\nLatest audioLatest videos\n\nLive TV\n\nImage: AA/picture alliance\n\n# Artificial intelligence\n\nArtificial intelligence (AI) is technology to make computers and machines simulate human learning, comprehension, decision-making and even creativity.\n\nSkip next section News\n\n## News\n\nNovember 6, 2026\n\n### Data center protesters break into Microsoft site in Amsterdam\n\nNovember 6, 2026 [...] With the rapid advances in AI translation technology, some linguists think human interpreters may soon be obsolete.\n\nSocietyNovember 1, 202609:50 min\n\n### America's AI race: Are the risks being ignored?\n\nUS President Donald Trump says AI is the future. But a growing number of voters are worried about the risks.\n\nPoliticsOctober 24, 202605:15 min\n\n### Deepfakes, bots and distrust: How AI is shaping Israel's election [...] Israel's political parties are using AI for deepfakes, robocalls and bots. Experts warn that it could tilt the election.\n\nPoliticsOctober 19, 2026\n\n### You can get AI answers for free. Who really pays?\n\nEvery AI answer feels free, but there are energy and data center costs.\n\nBusinessOctober 19, 202603:21 min\n\n### The EU wants an AI revolution. But on whose terms?\n\nThe European Union wants to catch up on AI. Can it compete with the US while protecting workers, safety and the climate?",
+                "score": 0.65173227
+              },
+              {
+                "title": "Super Intelligence",
+                "url": "https://www.anl.gov/si",
+                "source": "anl.gov",
+                "summary": "Super Intelligence (SI), also known as Artificial Intelligence (AI), is transforming how we advance science, strengthen national security, and drive U.S. innovation leadership. Argonne is leveraging world-class expertise and computing power to lead in the responsible development and deployment of SI. Our researchers are applying cutting-edge SI to engineer next-generation materials, fortify the nation’s energy infrastructure, speed breakthroughs in medical treatments, and automate scientific [...] automate scientific experiments. These efforts are unlocking new frontiers of discovery while enhancing resilience and competitiveness across critical sectors.",
+                "score": 0.49318945
+              },
+              {
+                "title": "C3.ai, Inc. (AI) Stock Price, News, Quote & History - Yahoo Finance",
+                "url": "https://finance.yahoo.com/quote/AI",
+                "source": "finance.yahoo.com",
+                "summary": "| Field | Value |\n --- |\n| Previous close | 11.69 |\n| Open | 11.70 |\n| Day low | 11.66 |\n| Day high | 12.10 |\n| Dividend yield | 0.00% |\n| Beta | 2.13 |\n| Forward pe | -25.52 |\n| Volume | 3,171,180 |\n| Average volume | 4,939,442 |\n| Average volume10days | 4,221,240 |\n| Average daily volume10 day | 4,221,240 |\n| Bid | 11.75 |\n| Ask | 0.00 |\n| Bid size | 70,000 |\n| Ask size | 100,000 |\n| Market cap | 1,929,358,336 |\n| Non diluted market cap | 1,879,516,516 |\n| Fifty two week low | 7.68 | [...] | AI Q2 FY2025 earnings call transcript | 2025 | Q2 | 2024-12-09 | 2026-07-08 | 3740916 | IN_HOUSE | 228044 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2024/12/9/3740916.json |\n| AI Q1 FY2025 earnings call transcript | 2025 | Q1 | 2024-09-04 | 2026-06-27 | 2641096 | IN_HOUSE | 198847 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2024/9/4/2641096.json | [...] | AI Q4 FY2026 earnings call transcript | 2026 | Q4 | 2026-06-03 | 2026-06-27 | 3471122 | IN_HOUSE | 557460 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2026/6/3/3471122.json |\n| AI Q3 FY2026 earnings call transcript | 2026 | Q3 | 2026-02-25 | 2026-06-27 | 3232845 | IN_HOUSE | 483789 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2026/2/25/3232845.json |",
+                "score": 0.3681336
+              },
+              {
+                "title": "Artificial Intelligence - IBM Research",
+                "url": "https://research.ibm.com/artificial-intelligence",
+                "source": "research.ibm.com",
+                "summary": "## Topics\n\n Adversarial Robustness and Privacy\n AI for Asset Management\n AI for Business Automation\n AI for Code\n AI for Supply Chain\n AI Testing\n Automated AI\n Causality\n Computer Vision\n Conversational AI\n Explainable AI\n Fairness, Accountability, Transparency\n Foundation Models\n Generative AI\n Granite\n Human-Centered AI\n Knowledge and Reasoning\n Machine Learning\n Natural Language Processing\n Neuro-symbolic AI\n Speech\n Trustworthy AI\n Trustworthy Generation\n Uncertainty Quantification [...] Large language models are revolutionizing the world, but today, delivering them safely and efficiently at the scale enterprise needs is difficult. IBM Research is designing powerful new ways to support the future of business, with open-source tools to prepare, secure, and use data, along with best-in-class multimodal models, and technology that redefines how we interact with AI systems. Generative computing is how we move beyond AI prompting to AI programming.\n\nFeatured topics: [...] With over 3,000 researchers across the globe, IBM Research has a long pedigree of turning fundamental research into world-altering technology. Learn more about the ways that we collaborate with businesses and organizations across the globe to help solve their most pressing needs faster.\n\n MIT-IBM Watson AI Lab\n AI Hardware Center",
+                "score": 0.33528608
+              },
+              {
+                "title": "13 Mind-Blowing AI Hacks That Can Actually Change Your Life",
+                "url": "https://www.youtube.com/watch?v=yMKHtJpgZzc",
+                "source": "youtube.com",
+                "summary": "Here are 13 AI hacks you can use today. An AI agent calls your internet company and cuts your bill. Claude Code finds why your PC is slow. An agent removes your data from data brokers. Then: an offline AI for emergencies, a giant arrow that shows you where to click, plain AI writing with ASD-STE100, Claude in your car, flight price alerts and interactive lessons in Google AI Mode, Claude Code from your phone, AI sports coaching, smart glasses that spot what to pick, and Claude in Chrome that [...] Get the prompts for every hack free in Maker Zero (the second link above).\n\nChapters\n0:00 13 AI hacks\n0:11 Let AI call your internet company\n0:51 Speed up your PC with Claude Code\n1:45 Remove your data from data brokers\n2:48 4th\n3:40 5th\n4:22 6th\n5:08 7th\n5:48 8th\n6:21 9th\n7:01 10th\n7:49 11th\n8:51 12th\n9:54 13th\n10:27 What else AI can do [...] ### Chapters\n[0:00] 13 AI hacks\n[0:11] Let AI call your internet company\n[0:51] Speed up your PC with Claude Code\n[1:45] Remove your data from data brokers\n[2:48] 4th\n[3:40] 5th\n[4:22] 6th\n[5:08] 7th\n[5:48] 8th\n[6:21] 9th\n[7:01] 10th\n[7:49] 11th\n[8:51] 12th\n[9:54] 13th\n[10:27] What else AI can do",
+                "score": 0.2854521
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R04_read_url_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_read_url",
+        "difficulty": "easy",
+        "what_it_tests": "Đã có link cụ thể → read_url, không phải web_search."
+      },
+      "input": "Tóm tắt bài này giúp mình: https://openai.com/blog/gpt-5",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://openai.com/blog/gpt-5"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://openai.com/blog/gpt-5"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "fetch",
+          "args": {
+            "url": "https://openai.com/blog/gpt-5"
+          },
+          "result": {
+            "tool": "read_url",
+            "url": "https://openai.com/blog/gpt-5",
+            "items": [
+              {
+                "title": "OpenAI",
+                "url": "https://openai.com/blog/gpt-5",
+                "source": "openai.com",
+                "summary": "OpenAI\n\n# 404\n\nSearch finds no result\n\nThe question still earns its keep\n\nAsk it a new way\n\nby [gpt-6-astra(opens in a new window)](https://chatgpt.com/?surface=work&model=gpt-6-astra-wm&openaicom-did=52cdc990-ae75-4748-bf07-215286d35858&openaicom_referred=true)"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R05_limit_arg",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "arg_limit",
+        "difficulty": "easy",
+        "what_it_tests": "Trích đúng limit=10 từ '10 tweet'."
+      },
+      "input": "Lấy 10 tweet mới nhất của Elon Musk",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 10
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 10
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "elonmusk",
+            "limit": 10
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "screenname": "elonmusk",
+            "items": [
+              {
+                "title": "RT @XFreeze: Elon Musk just revealed a massive update on Grok 4.8, and SpaceXSI has completely rebuilt its reinforcement",
+                "summary": "RT @XFreeze: Elon Musk just revealed a massive update on Grok 4.8, and SpaceXSI has completely rebuilt its reinforcement learning and infer…",
+                "url": "https://x.com/elonmusk/status/2120102894817173862",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:34:54 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 155,
+                  "views": "420619"
+                }
+              },
+              {
+                "title": "Turns out that the Starlink software, built for managing the movement of vast amounts of data through space and to the g",
+                "summary": "Turns out that the Starlink software, built for managing the movement of vast amounts of data through space and to the ground, is also very well suited to training super intelligence",
+                "url": "https://x.com/elonmusk/status/2120102767624880364",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:34:24 +0000 2026",
+                "metrics": {
+                  "favorites": 8597,
+                  "retweets": 793,
+                  "views": "628780"
+                }
+              },
+              {
+                "title": "RT @XFreeze: Elon Musk just revealed something huge about Grok's new SI training and inference infrastructure",
+                "summary": "RT @XFreeze: Elon Musk just revealed something huge about Grok's new SI training and inference infrastructure\n\nThe engineering behind Starl…",
+                "url": "https://x.com/elonmusk/status/2120101380144992635",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:28:53 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 106,
+                  "views": "384359"
+                }
+              },
+              {
+                "title": "RT @beffjezos: Taking the Shinkansen and all I can think about is how do we not have this between SF and LA...",
+                "summary": "RT @beffjezos: Taking the Shinkansen and all I can think about is how do we not have this between SF and LA...\n\n if only you knew how great…",
+                "url": "https://x.com/elonmusk/status/2120090806765932705",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 09:46:52 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 96,
+                  "views": "450271"
+                }
+              },
+              {
+                "title": "RT @TheCaptainEli: In February 2004 Elon Musk wrote the check that put Tesla Motors on the road: $6.5 million of a $7.5 ",
+                "summary": "RT @TheCaptainEli: In February 2004 Elon Musk wrote the check that put Tesla Motors on the road: $6.5 million of a $7.5 million Series A, p…",
+                "url": "https://x.com/elonmusk/status/2120082348398256182",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 09:13:15 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 175,
+                  "views": "468182"
+                }
+              },
+              {
+                "title": "RT @MegynKellyShow: .@MegynKelly on the absolute double standard in the Russell Brand sentencing: “If you needed any fur",
+                "summary": "RT @MegynKellyShow: .@MegynKelly on the absolute double standard in the Russell Brand sentencing: “If you needed any further proof that thi…",
+                "url": "https://x.com/elonmusk/status/2119996001490768028",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:30:09 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 1400,
+                  "views": "569365"
+                }
+              },
+              {
+                "title": "RT @firesidealpha: JUST IN: Memphis Mayor reveals SpaceX data center taxes more than doubled to $54 million, after $25 m",
+                "summary": "RT @firesidealpha: JUST IN: Memphis Mayor reveals SpaceX data center taxes more than doubled to $54 million, after $25 million last year ma…",
+                "url": "https://x.com/elonmusk/status/2119993726898774521",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:21:06 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 436,
+                  "views": "495558"
+                }
+              },
+              {
+                "title": "RT @ricwe123: The Germans are learning what mass immigration really means.",
+                "summary": "RT @ricwe123: The Germans are learning what mass immigration really means.\n\n\"Wir schaffen das\" https://t.co/pEQc1OMbao",
+                "url": "https://x.com/elonmusk/status/2119992481156829218",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:16:09 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 2368,
+                  "views": "474901"
+                }
+              },
+              {
+                "title": "RT @JTLonsdale: The UK “justice system” is an utter joke. Beyond parody. Total dishonor.",
+                "summary": "RT @JTLonsdale: The UK “justice system” is an utter joke. Beyond parody. Total dishonor.",
+                "url": "https://x.com/elonmusk/status/2119991850820051347",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:13:39 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 361,
+                  "views": "449831"
+                }
+              },
+              {
+                "title": "RT @TheJadeWarwick: UK judge gives Russel Brand 10 years 6 months for “rape”. ",
+                "summary": "RT @TheJadeWarwick: UK judge gives Russel Brand 10 years 6 months for “rape”. \nNo forensic evidence. No DNA. No CCTV. \n\nSame country and sy…",
+                "url": "https://x.com/elonmusk/status/2119991792842260619",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:13:25 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 841,
+                  "views": "417805"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R06_timeframe_arg",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "arg_timeframe",
+        "difficulty": "medium",
+        "what_it_tests": "'tuần này' → timeframe=week."
+      },
+      "input": "Tin công nghệ trong tuần này",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "week"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "tin công nghệ trong tuần này"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "topic: expected 'news', got None",
+          "timeframe: expected 'week', got None"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "tin công nghệ trong tuần này"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "tin công nghệ trong tuần này",
+            "topic": "general",
+            "timeframe": "week",
+            "items": [
+              {
+                "title": "Cổ phiếu công nghệ hồi phục sau đợt sụt giảm mạnh trong tuần trước",
+                "url": "https://baotintuc.vn/co-phieu-cong-nghe-hoi-phuc-sau-dot-sut-giam-manh-trong-tuan-truoc-post1401233.html",
+                "source": "baotintuc.vn",
+                "summary": "Bà Sally Auld, chuyên gia tại ngn hàng National Australia Bank, nhận định trong tuần này, các nhà đầu tư sẽ theo dõi sát sao để xác định xem đà tăng hiện tại chỉ đơn thuần là nhờ hoạt động mua vào khi giá thấp hay là khởi đầu cho một xu hướng bền vững hơn. Những lo ngại về quy định đối với lĩnh vực AI, cùng với triển vọng về chi tiêu vốn và dòng tiền tự do, là các yếu tố thúc đẩy xu hướng giảm thiểu rủi ro trong những tuần gần đy. Nhiều khả năng, các vấn đề này sẽ chưa thể sớm được giải quyết [...] Trong tuần này, các nhà đầu tư sẽ theo dõi sát sao số liệu lạm phát mới nhất từ Mỹ, sau khi báo cáo công bố cuối tuần trước cho thấy nền kinh tế nước này đã tạo ra số lượng việc làm trong tháng 10/2026 vượt xa dự báo. Những số liệu này sẽ đóng vai trò then chốt để Cục Dự trữ liên bang Mỹ (Fed) quyết định xem có tăng lãi suất trong cuộc họp tiếp theo vào tháng 12 tới hay không. Các nhà giao dịch dự báo khả năng Fed nng lãi suất là 80%. [...] ## Vietjet mở rộng cầu nối Việt Nam – Nhật Bản với đường bay mới Đà Nẵng – Osaka\n\nChagee đưa bản sắc Việt Nam vào hành trình kết nối qua Văn hóa Trà  \n\n## Chagee đưa bản sắc Việt Nam vào hành trình kết nối qua Văn hóa Trà\n\nFPT đề xuất hợp tác với Nhật Bản về AI, công nghệ lượng tử  \n\n## FPT đề xuất hợp tác với Nhật Bản về AI, công nghệ lượng tử\n\nDe Heus - Hùng Nhơn thúc đẩy chuỗi dự án trị giá 18.300 tỷ đồng  \n\n## De Heus - Hùng Nhơn thúc đẩy chuỗi dự án trị giá 18.300 tỷ đồng",
+                "score": 0.68420124
+              },
+              {
+                "title": "1.7K views · 14 reactions | Mời quý vị cùng đón xem những tin tức đáng quan tâm trong ngày hôm nay 09.11.2026 | Bill Gates cảnh báo AI có thể gây ra đại dịch tệ hơn COVID-19\n\n➡ 1. Gia tăng tài xế phớt lờ lệnh cấm lái xe và nạn bạo lực trên đường tại Séc\n➡ 2. Iran công bố bản đồ 15 cơ sở quân sự tiềm năng tại châu Âu\n➡ 3. Đồng Nai: Chuẩn bị phương án giao thông phục vụ sân bay Long Thành\n\n👉 Kênh Youtube: https://bit.ly/3lZiJdt \n🔹 Facebook Fanpage: https://facebook.com/tamdamedia.eu \n🔹 Group: https://facebook.com/groups/TamdaMedia \n🔹 Website TamdaMedia: https://tamdamedia.eu/ \n👉 Đừng quên LIKE và Chia Sẻ cho TamdaMedia nhé | TamdaMedia.eu",
+                "url": "https://www.facebook.com/tamdamedia.eu/posts/m%E1%BB%9Di-qu%C3%BD-v%E1%BB%8B-c%C3%B9ng-%C4%91%C3%B3n-xem-nh%E1%BB%AFng-tin-t%E1%BB%A9c-%C4%91%C3%A1ng-quan-t%C3%A2m-trong-ng%C3%A0y-h%C3%B4m-nay-09112026-/1777812271017705",
+                "source": "facebook.com",
+                "summary": "[](\n\nDân số Séc đang già hóa nhanh, trong khi lĩnh vực dịch vụ xã hội hiện thiếu khoảng 1.500 nhân viên chăm sóc. Con số này được dự báo tiếp tục tăng trong những năm tới, làm dấy lên lo ngại sẽ không còn đủ người chăm sóc người cao tuổi. Các công nghệ hiện đại, trong đó có “cháu gái AI”, đang được sử dụng để san sẻ một phần công việc.\n\nTamdaMedia.eu\n\n2.2K views\n\n · \n\n15h ago\n\nImage 25: Video thumbnail 1:37\n\n[]( [...] [](\n\nBé gái gốc Việt 13 tuổi Lisa, mất tích trên đường đến trường ở Berlin từ ngày 3/11, đã được phát hiện tử vong trong một căn nhà bỏ trống tại bang Brandenburg, cách thủ đô Đức hơn 50 km. Một người đàn ông bị tình nghi bắt cóc và sát hại em cũng được tìm thấy tại hiện trường trong tình trạng bị thương nặng.\n\nTamdaMedia.eu\n\n226.7K views\n\n · \n\n14h ago\n\nImage 24: Video thumbnail 1:31\n\n[]( [...] Image 1\n\nVideo 1\n\nMời quý vị cùng đón xem những tin tức đáng quan tâm trong ngày hôm nay 09.11.2026 | Bill Gates cảnh báo AI có thể gây ra đại dịch tệ hơn COVID-19 ➡ 1. Gia tăng tài xế phớt lờ lệnh cấm lái xe và nạn bạo lực trên đường tại Séc ➡ 2. Iran công bố bản đồ 15 cơ sở quân sự tiềm năng tại châu Âu ➡ 3. Đồng Nai: Chuẩn bị phương án giao thông phục vụ sân bay Long Thành 👉 Kênh Youtube:  🔹 Facebook Fanpage:  🔹 Group:  🔹 Website TamdaMedia:  👉 Đừng quên LIKE và Chia Sẻ cho TamdaMedia nhé",
+                "score": 0.5510187
+              },
+              {
+                "title": "Nhà đầu tư ngờ vực mức định giá 2.000 tỷ USD của Anthropic - Báo VnExpress Kinh doanh",
+                "url": "https://vnexpress.net/nha-dau-tu-ngo-vuc-muc-dinh-gia-2-000-ty-usd-cua-anthropic-5142087.html",
+                "source": "vnexpress.net",
+                "summary": "VnExpress - Bao tieng Viet nhieu nguoi xem nhat    Chủ nhật, 8/11/2026  \n\nMới nhất \n\nTin theo khu vực \n\n Hà Nội\n TP HCM\n\nInternational\n \n\n Trở lại Kinh doanh\n\n Kinh doanh\n Quốc tế\n\nChủ nhật, 8/11/2026, 11:00 (GMT+7)\n\n## Nhà đầu tư ngờ vực mức định giá 2.000 tỷ USD của Anthropic\n\n# Nhà đầu tư ngờ vực mức định giá 2.000 tỷ USD của Anthropic\n\nSau làn sóng bán tháo cổ phiếu công nghệ tại Wall Street tuần này, một số nhà đầu tư đã hạ kỳ vọng với công ty mẹ Claude. [...] Tuần tới, Anthropic dự kiến thực hiện roadshow trước thềm IPO. Công ty này sẽ niêm yết trên sàn Nasdaq với mã ANT và có thể có phiên giao dịch đầu tiên trong vài tuần tới. Tháng trước, giới truyền thông đưa tin công ty mẹ ứng dụng AI Claude đang nhắm đến mức định giá lên tới 2.000 tỷ USD. Hồi tháng 5, công ty này mới chỉ được định giá 965 tỷ USD. [...] Sự thay đổi này diễn ra trong bối cảnh nhà đầu tư ngày càng lo ngại về mức chi tiêu quá lớn của các công ty AI và thị trường giảm mạnh sau cuộc bầu cử giữa nhiệm kỳ tại Mỹ tuần này. Chỉ số Nasdaq Composite mất hơn 5% phiên 5/11 - mạnh nhất 19 tháng. Nhà đầu tư lo ngại việc đảng Dn chủ giành quyền kiểm soát Quốc hội và làn sóng phản đối AI tại Mỹ sẽ làm chậm tiến độ xy dựng các trung tm dữ liệu.",
+                "score": 0.47008035
+              },
+              {
+                "title": "AI\\ : Alphabet lên kế hoạch gọi vốn kỷ lục, 4 Big Tech được dự báo chi lượng tiền gấp 2 lần GDP Việt Nam cho AI: Thấy gì từ \"cuộc đua\" này?",
+                "url": "https://cafef.vn/ai.html",
+                "source": "cafef.vn",
+                "summary": "02/11/2026 13:48\n\nDu lịch Nhật Bản luôn hấp dẫn, nhưng rào cản ngôn ngữ tại các quán ăn địa phương lại là nỗi ám ảnh lớn. MENU-PAAN, một ứng dụng AI đột phá, ra đời để giải quyết triệt để vấn đề này, biến các thực đơn viết tay thành thông tin dễ hiểu.\n\nChùa ảo Hàn Quốc vừa nổi, Đài Loan đã có miếu Ma Tổ online, sáng sớm đã chật kín người xếp hàng chờ  \n\n### Chùa ảo Hàn Quốc vừa nổi, Đài Loan đã có miếu Ma Tổ online, sáng sớm đã chật kín người xếp hàng chờ \"gieo quẻ, xin xăm\"\n\n02/11/2026 09:00 [...] 02/11/2026 09:00\n\nChưa đầy một tuần sau khi ngôi chùa online Sansa làm nghẽn server ở Hàn Quốc, Đài Loan đã có miếu Ma Tổ ảo cho gieo quẻ m dương, xin xăm, còn người Công giáo có nhà thờ ảo để thắp nến. Thứ các sản phẩm này bán không phải tín ngưỡng, mà là quyền được ngồi yên mà không ai đòi hỏi gì.\n\nĐại diện FPT đề xuất hợp tác với doanh nghiệp Nhật Bản phát triển AI cho khu vực công Việt Nam \n\n### Đại diện FPT đề xuất hợp tác với doanh nghiệp Nhật Bản phát triển AI cho khu vực công Việt Nam [...] 03/11/2026 07:52\n\nLo ngại AI có thể hủy diệt nhn loại trong vòng 10 năm tới, cựu kỹ sư Google Nate Soares cho rằng tương lai quá bất định để tiếp tục tích lũy tiền cho tuổi nghỉ hưu.\n\nTừng làm cho Bộ ngoại giao Nhật Bản, người đàn ông này giờ đang phát triển ứng dụng dịch thuật món ăn ngay giữa thời đại AI \n\n### Từng làm cho Bộ ngoại giao Nhật Bản, người đàn ông này giờ đang phát triển ứng dụng dịch thuật món ăn ngay giữa thời đại AI\n\n02/11/2026 13:48",
+                "score": 0.4256297
+              },
+              {
+                "title": "Tin tức Sự kiện | Cổng Thông tin điện tử Bộ Khoa học và Công nghệ",
+                "url": "https://mst.gov.vn/tin-tuc-su-kien.htm",
+                "source": "mst.gov.vn",
+                "summary": "Bỏ qua đến nội dung chính\n\nBỘ KHOA HỌC VÀ CÔNG NGHỆ \n\nBỘ KHOA HỌC VÀ CÔNG NGHỆ Ministry of Science and Technology\n\nTiếng Việt English\n\nThứ ba, 10/11/2026\n\nDanh mục\n\n Trang chủ\n Giới thiệu  arrow-drop-down\n\n  Chức năng nhiệm vụ Cơ cấu tổ chức Lịch sử phát triển Sở Khoa học và Công nghệ\n Tin tức sự kiện  arrow-drop-down [...] ## Phát triển AI lấy con người làm trung tm, thúc đẩy hợp tác quốc tế\n\nTại Phiên bàn tròn Bộ trưởng Số và AI trong khuôn khổ Tuần lễ Số Quốc tế Việt Nam 2026, đại diện nhiều quốc gia và tổ chức quốc tế đã chia sẻ kinh nghiệm, định hướng chính sách và những ưu tiên trong phát triển, ứng dụng trí tuệ nhn tạo an toàn, hiệu quả và lấy con người làm trung tm.\n\nChương trình NEXUS giai đoạn 2025-2026 tài trợ 11 dự án nghiên cứu với tổng giá trị gần 500 tỷ đồng [...] Chuyển đổi trí tuệ nhn tạo (AI) không thể chỉ dựa vào nỗ lực của Chính phủ mà cần sự tham gia chặt chẽ của doanh nghiệp, các trường đại học, viện nghiên cứu và tổ chức quốc tế. Đy là thông điệp xuyên suốt Phiên thảo luận bàn tròn thứ hai với chủ đề \"Góc nhìn hợp tác: Doanh nghiệp, giới học thuật và các tổ chức quốc tế\", diễn ra sáng 28/10, trong khuôn khổ Tuần lễ Số Quốc tế Việt Nam 2026 tại Quảng Ninh.\n\nKết nối nghiên cứu với thị trường, mở rộng hợp tác đổi mới sáng tạo số ASEAN – EU",
+                "score": 0.3985943
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R07_search_type_arg",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "arg_search_type",
+        "difficulty": "medium",
+        "what_it_tests": "'phổ biến/top' → search_type=Top (không phải Latest)."
+      },
+      "input": "Cho mình các tweet phổ biến (top) nhất về OpenAI",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "search_type": "Top"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "OpenAI",
+              "limit": 5,
+              "search_type": "Top"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "missing tool call social_search",
+          "extra tool call timeline"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "OpenAI",
+            "limit": 5,
+            "search_type": "Top"
+          },
+          "result": {
+            "error": "TypeError",
+            "message": "get_user_tweets() got an unexpected keyword argument 'search_type'"
+          }
+        }
+      ]
+    },
+    {
+      "id": "R08_out_of_scope",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "out_of_scope",
+        "difficulty": "easy",
+        "what_it_tests": "Câu ngoài phạm vi research → KHÔNG gọi tool, từ chối/định hướng."
+      },
+      "input": "Giải giúp mình bài toán tích phân: nguyên hàm của x^2 là gì?",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Để tìm nguyên hàm của $ x^2 $, ta cần tìm một hàm $ F(x) $ sao cho $ F'(x) = x^2 $.\n\n**Bước 1:**\nSử dụng quy tắc tích phân của hàm số $ x^n $, với $ n \\neq -1 $, ta có:\n$$\n\\int x^n \\, dx = \\frac{x^{n+1}}{n+1} + C\n$$\n\n**Bước 2:**\nÁp dụng quy tắc trên cho $ n = 2 $:\n$$\n\\int x^2 \\, dx = \\frac{x^{2+1}}{2+1} + C = \\frac{x^3}{3} + C\n$$\n\n**Kết luận:**\nNguyên hàm của $ x^2 $ là:\n$$\n\\frac{x^3}{3} + C\n$$\nvới $ C $ là hằng số tích phân.",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "R09_no_tool_capability",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "no_tool_meta",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi meta → trả lời thẳng, KHÔNG gọi tool."
+      },
+      "input": "Bạn là gì và làm được những gì?",
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Tôi là một trợ lý tư vấn AI được phát triển để hỗ trợ người dùng trong việc tìm kiếm thông tin, phân tích nội dung, và thực hiện các nhiệm vụ liên quan đến công nghệ, khoa học, và các lĩnh vực khác. Tôi có thể giúp bạn tìm kiếm bài viết, bài đăng trên mạng xã hội, thông tin từ các nguồn web, và các tài liệu khoa học như arXiv.\n\nTôi có thể thực hiện các nhiệm vụ như:\n- Tìm kiếm thông tin trên web\n- Tìm bài đăng trên X/Twitter\n- Tìm các tài liệu khoa học trên arXiv\n- Định dạng các kết quả tìm kiếm thành bản tin Markdown\n- Gửi văn bản lên Telegram sau khi được xác nhận\n\nNếu bạn có bất kỳ câu hỏi nào, hãy cho tôi biết!",
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "R10_missing_handle",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "clarify_missing_handle",
+        "difficulty": "medium",
+        "what_it_tests": "Thiếu handle → ask_user, KHÔNG đoán bừa người nào."
+      },
+      "input": "Tóm tắt 5 tweet mới nhất giúp mình",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "your_screen_name",
+              "limit": 5
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "missing_info",
+        "failures": [
+          "missing tool call clarify",
+          "extra tool call timeline"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "your_screen_name",
+            "limit": 5
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "JSONDecodeError",
+            "message": "Expecting value: line 1 column 1 (char 0)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "R11_missing_url",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "clarify_missing_url",
+        "difficulty": "medium",
+        "what_it_tests": "Nói 'bài này' nhưng không có link → ask_user xin URL."
+      },
+      "input": "Tóm tắt bài viết này hộ mình",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [],
+        "actual_text": "Có thể bạn muốn tóm tắt một bài viết cụ thể nào đó. Vui lòng cung cấp URL hoặc tài khoản (nếu là bài viết trên X/Twitter) của bài viết đó, hoặc tên bài viết và chủ đề để tôi có thể hỗ trợ tốt hơn.",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "missing_info",
+        "failures": [
+          "missing tool call clarify"
+        ]
+      },
+      "tool_results": []
+    },
+    {
+      "id": "R12_confirm_before_send",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "confirm_before_write",
+        "difficulty": "medium",
+        "what_it_tests": "Hành động ghi (gửi) → xác nhận trước (ask_user yes_no), không tự gửi."
+      },
+      "input": "Đăng bản tin này lên Telegram giúp mình",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [],
+        "actual_text": "Chúng ta cần xác nhận trước khi gửi văn bản lên Telegram. Bạn có muốn gửi văn bản này lên Telegram không?",
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_boundary",
+        "failures": [
+          "missing tool call clarify"
+        ]
+      },
+      "tool_results": []
+    },
+    {
+      "id": "R13_parallel_web_and_tweets",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "parallel_tool_calls",
+        "difficulty": "hard",
+        "what_it_tests": "Một request cần hai nguồn → gọi cả web_search và search_tweets; eval không phụ thuộc thứ tự tool call."
+      },
+      "input": "Tìm trên web tin AI hôm nay và tìm thêm tweet về AI.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          },
+          {
+            "name": "social_search",
+            "args": {
+              "query": "AI"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "timeframe": "day",
+              "topic": "general"
+            }
+          },
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "Twitter",
+              "limit": 5
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "topic: expected 'news', got 'general'",
+          "missing tool call social_search",
+          "extra tool call timeline"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "AI",
+            "timeframe": "day",
+            "topic": "general"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AI",
+            "topic": "general",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "Artificial intelligence",
+                "url": "https://www.dw.com/en/artificial-intelligence/t-42133476",
+                "source": "dw.com",
+                "summary": "1. Skip to content\n2. Skip to main menu\n3. Skip to more DW sites\n\nIn focus\n\nCOP31Ukraine warAI\n\nLatest audioLatest videos\n\nLive TV\n\nImage: AA/picture alliance\n\n# Artificial intelligence\n\nArtificial intelligence (AI) is technology to make computers and machines simulate human learning, comprehension, decision-making and even creativity.\n\nSkip next section News\n\n## News\n\nNovember 6, 2026\n\n### Data center protesters break into Microsoft site in Amsterdam\n\nNovember 6, 2026 [...] With the rapid advances in AI translation technology, some linguists think human interpreters may soon be obsolete.\n\nSocietyNovember 1, 202609:50 min\n\n### America's AI race: Are the risks being ignored?\n\nUS President Donald Trump says AI is the future. But a growing number of voters are worried about the risks.\n\nPoliticsOctober 24, 202605:15 min\n\n### Deepfakes, bots and distrust: How AI is shaping Israel's election [...] Israel's political parties are using AI for deepfakes, robocalls and bots. Experts warn that it could tilt the election.\n\nPoliticsOctober 19, 2026\n\n### You can get AI answers for free. Who really pays?\n\nEvery AI answer feels free, but there are energy and data center costs.\n\nBusinessOctober 19, 202603:21 min\n\n### The EU wants an AI revolution. But on whose terms?\n\nThe European Union wants to catch up on AI. Can it compete with the US while protecting workers, safety and the climate?",
+                "score": 0.65173227
+              },
+              {
+                "title": "Super Intelligence",
+                "url": "https://www.anl.gov/si",
+                "source": "anl.gov",
+                "summary": "Super Intelligence (SI), also known as Artificial Intelligence (AI), is transforming how we advance science, strengthen national security, and drive U.S. innovation leadership. Argonne is leveraging world-class expertise and computing power to lead in the responsible development and deployment of SI. Our researchers are applying cutting-edge SI to engineer next-generation materials, fortify the nation’s energy infrastructure, speed breakthroughs in medical treatments, and automate scientific [...] automate scientific experiments. These efforts are unlocking new frontiers of discovery while enhancing resilience and competitiveness across critical sectors.",
+                "score": 0.49318945
+              },
+              {
+                "title": "C3.ai, Inc. (AI) Stock Price, News, Quote & History - Yahoo Finance",
+                "url": "https://finance.yahoo.com/quote/AI",
+                "source": "finance.yahoo.com",
+                "summary": "| Field | Value |\n --- |\n| Previous close | 11.69 |\n| Open | 11.70 |\n| Day low | 11.66 |\n| Day high | 12.10 |\n| Dividend yield | 0.00% |\n| Beta | 2.13 |\n| Forward pe | -25.52 |\n| Volume | 3,171,180 |\n| Average volume | 4,939,442 |\n| Average volume10days | 4,221,240 |\n| Average daily volume10 day | 4,221,240 |\n| Bid | 11.75 |\n| Ask | 0.00 |\n| Bid size | 70,000 |\n| Ask size | 100,000 |\n| Market cap | 1,929,358,336 |\n| Non diluted market cap | 1,879,516,516 |\n| Fifty two week low | 7.68 | [...] | AI Q2 FY2025 earnings call transcript | 2025 | Q2 | 2024-12-09 | 2026-07-08 | 3740916 | IN_HOUSE | 228044 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2024/12/9/3740916.json |\n| AI Q1 FY2025 earnings call transcript | 2025 | Q1 | 2024-09-04 | 2026-06-27 | 2641096 | IN_HOUSE | 198847 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2024/9/4/2641096.json | [...] | AI Q4 FY2026 earnings call transcript | 2026 | Q4 | 2026-06-03 | 2026-06-27 | 3471122 | IN_HOUSE | 557460 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2026/6/3/3471122.json |\n| AI Q3 FY2026 earnings call transcript | 2026 | Q3 | 2026-02-25 | 2026-06-27 | 3232845 | IN_HOUSE | 483789 | Earnings call | s3://890742573995-market-data-service-prod-us-east-1/shared/transcripts/2026/2/25/3232845.json |",
+                "score": 0.3681336
+              },
+              {
+                "title": "Artificial Intelligence - IBM Research",
+                "url": "https://research.ibm.com/artificial-intelligence",
+                "source": "research.ibm.com",
+                "summary": "## Topics\n\n Adversarial Robustness and Privacy\n AI for Asset Management\n AI for Business Automation\n AI for Code\n AI for Supply Chain\n AI Testing\n Automated AI\n Causality\n Computer Vision\n Conversational AI\n Explainable AI\n Fairness, Accountability, Transparency\n Foundation Models\n Generative AI\n Granite\n Human-Centered AI\n Knowledge and Reasoning\n Machine Learning\n Natural Language Processing\n Neuro-symbolic AI\n Speech\n Trustworthy AI\n Trustworthy Generation\n Uncertainty Quantification [...] Large language models are revolutionizing the world, but today, delivering them safely and efficiently at the scale enterprise needs is difficult. IBM Research is designing powerful new ways to support the future of business, with open-source tools to prepare, secure, and use data, along with best-in-class multimodal models, and technology that redefines how we interact with AI systems. Generative computing is how we move beyond AI prompting to AI programming.\n\nFeatured topics: [...] With over 3,000 researchers across the globe, IBM Research has a long pedigree of turning fundamental research into world-altering technology. Learn more about the ways that we collaborate with businesses and organizations across the globe to help solve their most pressing needs faster.\n\n MIT-IBM Watson AI Lab\n AI Hardware Center",
+                "score": 0.33528608
+              },
+              {
+                "title": "13 Mind-Blowing AI Hacks That Can Actually Change Your Life",
+                "url": "https://www.youtube.com/watch?v=yMKHtJpgZzc",
+                "source": "youtube.com",
+                "summary": "Here are 13 AI hacks you can use today. An AI agent calls your internet company and cuts your bill. Claude Code finds why your PC is slow. An agent removes your data from data brokers. Then: an offline AI for emergencies, a giant arrow that shows you where to click, plain AI writing with ASD-STE100, Claude in your car, flight price alerts and interactive lessons in Google AI Mode, Claude Code from your phone, AI sports coaching, smart glasses that spot what to pick, and Claude in Chrome that [...] Get the prompts for every hack free in Maker Zero (the second link above).\n\nChapters\n0:00 13 AI hacks\n0:11 Let AI call your internet company\n0:51 Speed up your PC with Claude Code\n1:45 Remove your data from data brokers\n2:48 4th\n3:40 5th\n4:22 6th\n5:08 7th\n5:48 8th\n6:21 9th\n7:01 10th\n7:49 11th\n8:51 12th\n9:54 13th\n10:27 What else AI can do [...] ### Chapters\n[0:00] 13 AI hacks\n[0:11] Let AI call your internet company\n[0:51] Speed up your PC with Claude Code\n[1:45] Remove your data from data brokers\n[2:48] 4th\n[3:40] 5th\n[4:22] 6th\n[5:08] 7th\n[5:48] 8th\n[6:21] 9th\n[7:01] 10th\n[7:49] 11th\n[8:51] 12th\n[9:54] 13th\n[10:27] What else AI can do",
+                "score": 0.2854521
+              }
+            ]
+          }
+        },
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "Twitter",
+            "limit": 5
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "JSONDecodeError",
+            "message": "Expecting value: line 1 column 1 (char 0)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "R14_out_of_scope_coding",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "out_of_scope_coding",
+        "difficulty": "easy",
+        "what_it_tests": "Câu coding ngoài phạm vi research/news → KHÔNG gọi tool."
+      },
+      "input": "Viết giúp mình một hàm Python tính Fibonacci bằng recursion.",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Dưới đây là một hàm Python tính Fibonacci bằng phương pháp đệ quy:\n\n```python\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)\n```\n\nBạn có thể gọi hàm này như sau:\n```python\nprint(fibonacci(10))  # Output: 55\n```\n\nNếu bạn muốn, tôi có thể giúp bạn viết hàm này lại bằng cách sử dụng đệ quy với các điều kiện cụ thể (ví dụ: bắt đầu từ 0 hoặc 1).",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "M01_clarify_then_fill",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_clarify_fill",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: carry limit=5 từ lượt 1 + map tên Elon Musk thành handle elonmusk từ lượt 2."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tóm tắt 5 tweet mới nhất giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "Của Elon Musk nhé"
+        },
+        {
+          "role": "user",
+          "content": "Giữ đúng 5 tweet, đừng đổi số lượng"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 5
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elon_musk",
+              "limit": 5
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "missing_info",
+        "failures": [
+          "screenname: expected 'elonmusk', got 'elon_musk'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "elon_musk",
+            "limit": 5
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "JSONDecodeError",
+            "message": "Expecting value: line 1 column 1 (char 0)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "M02_carryover_timeframe",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_carryover",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: chỉ xử lý latest turn, carry timeframe=day và topic=news, query robotics."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tin AI hôm nay có gì?"
+        },
+        {
+          "role": "user",
+          "content": "Còn về robotics thì sao?"
+        },
+        {
+          "role": "user",
+          "content": "Chỉ tìm robotics thôi, vẫn là tin hôm nay"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "robotics",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "choice",
+              "options": [
+                "tin hôm nay",
+                "tin tổng hợp"
+              ],
+              "question": "Bạn muốn tìm tin về robotics trong hôm nay hay vẫn là tin tổng hợp?"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "missing tool call lookup",
+          "extra tool call clarify"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "clarify",
+          "args": {
+            "response_type": "choice",
+            "options": [
+              "tin hôm nay",
+              "tin tổng hợp"
+            ],
+            "question": "Bạn muốn tìm tin về robotics trong hôm nay hay vẫn là tin tổng hợp?"
+          },
+          "result": {
+            "tool": "ask_user",
+            "question": "Bạn muốn tìm tin về robotics trong hôm nay hay vẫn là tin tổng hợp?",
+            "response_type": "choice",
+            "options": [
+              "tin hôm nay",
+              "tin tổng hợp"
+            ],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "M03_correction_handle",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_correction",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: map tên thường, sửa Sam Altman→Andrej Karpathy, dùng handle karpathy và limit=3."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tweet mới nhất của Sam Altman"
+        },
+        {
+          "role": "user",
+          "content": "À nhầm, của Andrej Karpathy"
+        },
+        {
+          "role": "user",
+          "content": "Lấy 3 tweet mới nhất nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "karpathy",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "SamAltman",
+              "limit": 3
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "screenname: expected 'karpathy', got 'SamAltman'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "SamAltman",
+            "limit": 3
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "JSONDecodeError",
+            "message": "Expecting value: line 1 column 1 (char 0)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "M04_clarify_then_url",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_clarify_url",
+        "difficulty": "medium",
+        "what_it_tests": "3 turns: sau khi được cung cấp URL, latest turn xác nhận chỉ đọc link đó → read_url đúng url."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tóm tắt bài này hộ mình"
+        },
+        {
+          "role": "user",
+          "content": "https://anthropic.com/news/claude"
+        },
+        {
+          "role": "user",
+          "content": "Chỉ đọc đúng link đó thôi"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://anthropic.com/news/claude"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://anthropic.com/news/claude"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "fetch",
+          "args": {
+            "url": "https://anthropic.com/news/claude"
+          },
+          "result": {
+            "tool": "read_url",
+            "url": "https://anthropic.com/news/claude",
+            "items": [
+              {
+                "title": "https://anthropic.com/news/claude",
+                "url": "https://anthropic.com/news/claude",
+                "source": "anthropic.com",
+                "summary": "[Skip to main content](https://www.anthropic.com/news/claude#main-content)\n\nA 404 poem byClaude Fable 5Claude Opus 5.5Claude Sonnet 5.5Claude Haiku 5.5\n\nYou came"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "M05_correction_limit",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_arg_correction",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: map tên Elon Musk, carry handle elonmusk, sửa limit 10→3."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Lấy 10 tweet mới nhất của Elon Musk"
+        },
+        {
+          "role": "user",
+          "content": "Cho mình 3 thôi"
+        },
+        {
+          "role": "user",
+          "content": "Vẫn của Elon Musk nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 10
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "limit: expected 3, got 10"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "elonmusk",
+            "limit": 10
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "screenname": "elonmusk",
+            "items": [
+              {
+                "title": "RT @XFreeze: Elon Musk just revealed a massive update on Grok 4.8, and SpaceXSI has completely rebuilt its reinforcement",
+                "summary": "RT @XFreeze: Elon Musk just revealed a massive update on Grok 4.8, and SpaceXSI has completely rebuilt its reinforcement learning and infer…",
+                "url": "https://x.com/elonmusk/status/2120102894817173862",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:34:54 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 157,
+                  "views": "421974"
+                }
+              },
+              {
+                "title": "Turns out that the Starlink software, built for managing the movement of vast amounts of data through space and to the g",
+                "summary": "Turns out that the Starlink software, built for managing the movement of vast amounts of data through space and to the ground, is also very well suited to training super intelligence",
+                "url": "https://x.com/elonmusk/status/2120102767624880364",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:34:24 +0000 2026",
+                "metrics": {
+                  "favorites": 8784,
+                  "retweets": 807,
+                  "views": "632490"
+                }
+              },
+              {
+                "title": "RT @XFreeze: Elon Musk just revealed something huge about Grok's new SI training and inference infrastructure",
+                "summary": "RT @XFreeze: Elon Musk just revealed something huge about Grok's new SI training and inference infrastructure\n\nThe engineering behind Starl…",
+                "url": "https://x.com/elonmusk/status/2120101380144992635",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:28:53 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 106,
+                  "views": "384831"
+                }
+              },
+              {
+                "title": "RT @beffjezos: Taking the Shinkansen and all I can think about is how do we not have this between SF and LA...",
+                "summary": "RT @beffjezos: Taking the Shinkansen and all I can think about is how do we not have this between SF and LA...\n\n if only you knew how great…",
+                "url": "https://x.com/elonmusk/status/2120090806765932705",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 09:46:52 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 96,
+                  "views": "450635"
+                }
+              },
+              {
+                "title": "RT @TheCaptainEli: In February 2004 Elon Musk wrote the check that put Tesla Motors on the road: $6.5 million of a $7.5 ",
+                "summary": "RT @TheCaptainEli: In February 2004 Elon Musk wrote the check that put Tesla Motors on the road: $6.5 million of a $7.5 million Series A, p…",
+                "url": "https://x.com/elonmusk/status/2120082348398256182",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 09:13:15 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 175,
+                  "views": "468478"
+                }
+              },
+              {
+                "title": "RT @MegynKellyShow: .@MegynKelly on the absolute double standard in the Russell Brand sentencing: “If you needed any fur",
+                "summary": "RT @MegynKellyShow: .@MegynKelly on the absolute double standard in the Russell Brand sentencing: “If you needed any further proof that thi…",
+                "url": "https://x.com/elonmusk/status/2119996001490768028",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:30:09 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 1400,
+                  "views": "569653"
+                }
+              },
+              {
+                "title": "RT @firesidealpha: JUST IN: Memphis Mayor reveals SpaceX data center taxes more than doubled to $54 million, after $25 m",
+                "summary": "RT @firesidealpha: JUST IN: Memphis Mayor reveals SpaceX data center taxes more than doubled to $54 million, after $25 million last year ma…",
+                "url": "https://x.com/elonmusk/status/2119993726898774521",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:21:06 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 436,
+                  "views": "495815"
+                }
+              },
+              {
+                "title": "RT @ricwe123: The Germans are learning what mass immigration really means.",
+                "summary": "RT @ricwe123: The Germans are learning what mass immigration really means.\n\n\"Wir schaffen das\" https://t.co/pEQc1OMbao",
+                "url": "https://x.com/elonmusk/status/2119992481156829218",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:16:09 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 2368,
+                  "views": "475031"
+                }
+              },
+              {
+                "title": "RT @JTLonsdale: The UK “justice system” is an utter joke. Beyond parody. Total dishonor.",
+                "summary": "RT @JTLonsdale: The UK “justice system” is an utter joke. Beyond parody. Total dishonor.",
+                "url": "https://x.com/elonmusk/status/2119991850820051347",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:13:39 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 361,
+                  "views": "449952"
+                }
+              },
+              {
+                "title": "RT @TheJadeWarwick: UK judge gives Russel Brand 10 years 6 months for “rape”. ",
+                "summary": "RT @TheJadeWarwick: UK judge gives Russel Brand 10 years 6 months for “rape”. \nNo forensic evidence. No DNA. No CCTV. \n\nSame country and sy…",
+                "url": "https://x.com/elonmusk/status/2119991792842260619",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:13:25 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 841,
+                  "views": "418041"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "M06_switch_tool",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_switch_tool",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: explicitly bỏ Twitter, chuyển sang web_search news, giữ chủ đề OpenAI."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mọi người nói gì về OpenAI trên Twitter?"
+        },
+        {
+          "role": "user",
+          "content": "Bỏ Twitter, chuyển sang tìm trên web tin tức đi"
+        },
+        {
+          "role": "user",
+          "content": "Giữ chủ đề OpenAI"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "OpenAI",
+              "topic": "news"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "limit": 5,
+              "screenname": "OpenAI"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "missing tool call lookup",
+          "extra tool call timeline"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "limit": 5,
+            "screenname": "OpenAI"
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "screenname": "OpenAI",
+            "items": [
+              {
+                "title": "We built Control Room, a central system to track model workloads across our research infrastructure and stop them quickl",
+                "summary": "We built Control Room, a central system to track model workloads across our research infrastructure and stop them quickly when safety or security concerns arise.\n\nIt connects every research inference workload, including agentic sampling for model training and evaluation, data processing, and more. This works together with our misalignment monitoring systems, and halts model output within 35 seconds of a decision to intervene to stop or pause a job.\n\nControl Room is just one part of our holistic approach for safe frontier model training and deployment.\n\nhttps://t.co/tc0lBqFdS5",
+                "url": "https://x.com/OpenAI/status/2119913172039868579",
+                "source": "@OpenAI",
+                "date": "Mon Nov 09 22:01:00 +0000 2026",
+                "metrics": {
+                  "favorites": 3968,
+                  "retweets": 280,
+                  "views": "674030"
+                }
+              },
+              {
+                "title": "RT @OpenAIDevs: You can now connect multiple local computers to the same dot and choose which one it uses for a task.",
+                "summary": "RT @OpenAIDevs: You can now connect multiple local computers to the same dot and choose which one it uses for a task.\n\nIt can build and tes…",
+                "url": "https://x.com/OpenAI/status/2119889726043992302",
+                "source": "@OpenAI",
+                "date": "Mon Nov 09 20:27:50 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 449,
+                  "views": "40711"
+                }
+              },
+              {
+                "title": "We partnered with @fmf_org and its member firms on a new framework to help identify when bypassing an AI system's safegu",
+                "summary": "We partnered with @fmf_org and its member firms on a new framework to help identify when bypassing an AI system's safeguards could enable serious cyber harm, and prioritize stronger protections.\n\n\"...This framework is an important step toward a common methodology for evaluating and comparing the severity of cyber jailbreaks, including the capabilities they unlock and how readily they can be used. Shared approaches like this can help the AI and security communities build a clearer evidence base and prioritize improvements to safeguards.\"  - OpenAI's Sasha Baker, Head of National Security Policy\n\nhttps://t.co/epOq98YPau",
+                "url": "https://x.com/OpenAI/status/2118795218099253606",
+                "source": "@OpenAI",
+                "date": "Fri Nov 06 19:58:39 +0000 2026",
+                "metrics": {
+                  "favorites": 1682,
+                  "retweets": 129,
+                  "views": "423446"
+                }
+              },
+              {
+                "title": "A new way to measure how AI agents handle the routine analyses of wet-lab science—BioBasicsBench.",
+                "summary": "A new way to measure how AI agents handle the routine analyses of wet-lab science—BioBasicsBench.\n\nDeveloped with Ligo, a biotech company focused on enzyme design, the benchmark draws on 100 tasks from real experiments to test whether agents can interpret raw lab data, identify errors, and recognize when the evidence doesn’t support a conclusion.\n\nAccelerating biological research starts with getting the everyday work right. BioBasicsBench shows where models need to improve, and helps us track what those gains mean for scientific progress, biosafety, and biosecurity.\n\nhttps://t.co/wN2xLk0YeW",
+                "url": "https://x.com/OpenAI/status/2118782708767965238",
+                "source": "@OpenAI",
+                "date": "Fri Nov 06 19:08:57 +0000 2026",
+                "metrics": {
+                  "favorites": 3750,
+                  "retweets": 281,
+                  "views": "880695"
+                }
+              },
+              {
+                "title": "Introducing GPT‑6 Cyber: a major advance in security research that pairs stronger capabilities with better model alignme",
+                "summary": "Introducing GPT‑6 Cyber: a major advance in security research that pairs stronger capabilities with better model alignment.\n\nThe model powered the Linux kernel research we announced yesterday, and security teams at companies like Mozilla, Palo Alto Networks, Calif, and Cisco—alongside our own at OpenAI—are already putting it to work.\n\nGPT-6 Cyber is available to select Daybreak Red customers and we are expanding access over time.\n\nhttps://t.co/Nzab3Z1Td6",
+                "url": "https://x.com/OpenAI/status/2118390190246879554",
+                "source": "@OpenAI",
+                "date": "Thu Nov 05 17:09:13 +0000 2026",
+                "metrics": {
+                  "favorites": 21426,
+                  "retweets": 2003,
+                  "views": "4129381"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
