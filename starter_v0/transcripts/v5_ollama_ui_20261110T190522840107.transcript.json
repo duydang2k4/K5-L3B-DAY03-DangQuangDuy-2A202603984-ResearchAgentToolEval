@@ -1,0 +1,334 @@
+{
+  "transcript_id": "v5_ollama_ui_20261110T190522840107",
+  "version": "v5",
+  "artifact_version": "v5+pa1ca32f6dff8+tf073692ef964",
+  "prompt_hash": "a1ca32f6dff84739809d018d40bea28bbcdda578e8d4dfaf52db7fce0a1028f3",
+  "tools_hash": "f073692ef964c687dfbe6d684bcd95bc649fcfa53ab85ab6ed7cb8d817c4edb0",
+  "provider": "ollama",
+  "model": "qwen3:1.7b",
+  "source": "streamlit_ui",
+  "created_at": "2026-11-10T19:05:22",
+  "turns": [
+    {
+      "turn_index": 1,
+      "started_at": "2026-11-10T19:05:23",
+      "user": "tim cho minh paper ve autonomous drive image retrieval",
+      "status": "answered",
+      "assistant_text": "Based on the provided arXiv results, here is a digest of the key findings from the listed papers:\n\n1. **SearchAD (2026-04-09)**  \n   - Focuses on semantic image retrieval for autonomous driving, with a well-defined data split.  \n   - Text-based methods outperform image-based ones due to stronger semantic grounding.  \n   - A fine-tuning baseline improves performance but still faces challenges in absolute retrieval.  \n   - Dataset: https://iis-esslingen.github.io/searchad/  \n\n2. **Spatial Retrieval Augmented Autonomous Driving (2025-12-07)**  \n   - Addresses limitations of onboard sensors in autonomous driving, such as perception horizon and visibility.  \n   - Proposes the spatial retrieval paradigm using offline geographic images from caches (e.g., Google Maps).  \n   - Extends the nuScenes dataset with geographic images and evaluates five core autonomous driving tasks.  \n   - Open-sources dataset curation code, data, and benchmarks.  \n\n3. **BEV-TSR (2024-01-02)**  \n   - Introduces BEV-TSR, a framework for text-scene retrieval in bird's-eye view (BEV) space.  \n   - Uses descriptive text as input to retrieve scenes and incorporates large language models and knowledge graphs.  \n   - Achieves state-of-the-art performance on nuScenes-Retrieval with top-1 accuracy of 85.78% and 87.66%.  \n   - Codes and datasets available.  \n\n4. **RAD (2025-03-18)**  \n   - Proposes a retrieval-augmented decision-making (RAD) framework for meta-actions in autonomous driving.  \n   - Uses a three-stage RAG pipeline to improve decision accuracy.  \n   - Fine-tunes VLMs on a curated NuScenes dataset to enhance spatial perception and bird's-eye view comprehension.  \n   - Outperforms baseline methods in match accuracy, F1 score, and self-defined overall score.  \n\nThese papers highlight advancements in autonomous driving, particularly in semantic image retrieval, spatial reasoning, and model fine-tuning for complex driving scenarios. The datasets and methodologies presented are critical for future research in autonomous driving and multi-modal retrieval.",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": "",
+          "tool_calls": [
+            {
+              "name": "papers",
+              "args": {
+                "query": "autonomous drive image retrieval"
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "papers",
+              "args": {
+                "query": "autonomous drive image retrieval"
+              },
+              "result": {
+                "tool": "arxiv_search",
+                "query": "autonomous drive image retrieval",
+                "api_query": "all:autonomous AND all:drive AND all:image AND all:retrieval",
+                "total_results": 70,
+                "items": [
+                  {
+                    "arxiv_id": "2508.00589v2",
+                    "title": "Context-based Motion Retrieval using Open Vocabulary Methods for Autonomous Driving",
+                    "summary": "Autonomous driving systems must operate reliably in safety-critical scenarios, particularly those involving unusual or complex behavior by Vulnerable Road Users (VRUs). Identifying these edge cases in driving datasets is essential for robust evaluation and generalization, but retrieving such rare human behavior scenarios within the long tail of large-scale datasets is challenging. To support targeted evaluation of autonomous driving systems in diverse, human-centered scenarios, we propose a novel context-aware motion retrieval framework. Our method combines Skinned Multi-Person Linear (SMPL)-based motion sequences and corresponding video frames before encoding them into a shared multimodal embedding space aligned with natural language. Our approach enables the scalable retrieval of human behavior and their context through text queries. This work also introduces our dataset WayMoCo, an extension of the Waymo Open Dataset. It contains automatically labeled motion and scene context descriptions derived from generated pseudo-ground-truth SMPL sequences and corresponding image data. Our approach outperforms state-of-the-art models by up to 27.5% accuracy in motion-context retrieval, when evaluated on the WayMoCo dataset.",
+                    "authors": [
+                      "Stefan Englmeier",
+                      "Max A. Büttner",
+                      "Katharina Winter",
+                      "Fabian B. Flohr"
+                    ],
+                    "published": "2025-08-01T12:41:52Z",
+                    "updated": "2025-08-12T09:43:48Z",
+                    "url": "http://arxiv.org/abs/2508.00589v2",
+                    "pdf_url": "https://arxiv.org/pdf/2508.00589v2",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CV",
+                    "categories": [
+                      "cs.CV",
+                      "cs.CL",
+                      "cs.IR",
+                      "cs.RO"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2604.08008v1",
+                    "title": "SearchAD: Large-Scale Rare Image Retrieval Dataset for Autonomous Driving",
+                    "summary": "Retrieving rare and safety-critical driving scenarios from large-scale datasets is essential for building robust autonomous driving (AD) systems. As dataset sizes continue to grow, the key challenge shifts from collecting more data to efficiently identifying the most relevant samples. We introduce SearchAD, a large-scale rare image retrieval dataset for AD containing over 423k frames drawn from 11 established datasets. SearchAD provides high-quality manual annotations of more than 513k bounding boxes covering 90 rare categories. It specifically targets the needle-in-a-haystack problem of locating extremely rare classes, with some appearing fewer than 50 times across the entire dataset. Unlike existing benchmarks, which focused on instance-level retrieval, SearchAD emphasizes semantic image retrieval with a well-defined data split, enabling text-to-image and image-to-image retrieval, few-shot learning, and fine-tuning of multi-modal retrieval models. Comprehensive evaluations show that text-based methods outperform image-based ones due to stronger inherent semantic grounding. While models directly aligning spatial visual features with language achieve the best zero-shot results, and our fine-tuning baseline significantly improves performance, absolute retrieval capabilities remain unsatisfactory. With a held-out test set on a public benchmark server, SearchAD establishes the first large-scale dataset for retrieval-driven data curation and long-tail perception research in AD: https://iis-esslingen.github.io/searchad/",
+                    "authors": [
+                      "Felix Embacher",
+                      "Jonas Uhrig",
+                      "Marius Cordts",
+                      "Markus Enzweiler"
+                    ],
+                    "published": "2026-04-09T09:10:41Z",
+                    "updated": "2026-04-09T09:10:41Z",
+                    "url": "http://arxiv.org/abs/2604.08008v1",
+                    "pdf_url": "https://arxiv.org/pdf/2604.08008v1",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CV",
+                    "categories": [
+                      "cs.CV",
+                      "cs.AI",
+                      "cs.LG"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2512.06865v1",
+                    "title": "Spatial Retrieval Augmented Autonomous Driving",
+                    "summary": "Existing autonomous driving systems rely on onboard sensors (cameras, LiDAR, IMU, etc) for environmental perception. However, this paradigm is limited by the drive-time perception horizon and often fails under limited view scope, occlusion or extreme conditions such as darkness and rain. In contrast, human drivers are able to recall road structure even under poor visibility. To endow models with this ``recall\" ability, we propose the spatial retrieval paradigm, introducing offline retrieved geographic images as an additional input. These images are easy to obtain from offline caches (e.g, Google Maps or stored autonomous driving datasets) without requiring additional sensors, making it a plug-and-play extension for existing AD tasks. For experiments, we first extend the nuScenes dataset with geographic images retrieved via Google Maps APIs and align the new data with ego-vehicle trajectories. We establish baselines across five core autonomous driving tasks: object detection, online mapping, occupancy prediction, end-to-end planning, and generative world modeling. Extensive experiments show that the extended modality could enhance the performance of certain tasks. We will open-source dataset curation code, data, and benchmarks for further study of this new autonomous driving paradigm.",
+                    "authors": [
+                      "Xiaosong Jia",
+                      "Chenhe Zhang",
+                      "Yule Jiang",
+                      "Songbur Wong",
+                      "Zhiyuan Zhang",
+                      "Chen Chen",
+                      "Shaofeng Zhang",
+                      "Xuanhe Zhou",
+                      "Xue Yang",
+                      "Junchi Yan",
+                      "Yu-Gang Jiang"
+                    ],
+                    "published": "2025-12-07T14:40:49Z",
+                    "updated": "2025-12-07T14:40:49Z",
+                    "url": "http://arxiv.org/abs/2512.06865v1",
+                    "pdf_url": "https://arxiv.org/pdf/2512.06865v1",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CV",
+                    "categories": [
+                      "cs.CV"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2401.01065v2",
+                    "title": "BEV-TSR: Text-Scene Retrieval in BEV Space for Autonomous Driving",
+                    "summary": "The rapid development of the autonomous driving industry has led to a significant accumulation of autonomous driving data. Consequently, there comes a growing demand for retrieving data to provide specialized optimization. However, directly applying previous image retrieval methods faces several challenges, such as the lack of global feature representation and inadequate text retrieval ability for complex driving scenes. To address these issues, firstly, we propose the BEV-TSR framework which leverages descriptive text as an input to retrieve corresponding scenes in the Bird's Eye View (BEV) space. Then to facilitate complex scene retrieval with extensive text descriptions, we employ a large language model (LLM) to extract the semantic features of the text inputs and incorporate knowledge graph embeddings to enhance the semantic richness of the language embedding. To achieve feature alignment between the BEV feature and language embedding, we propose Shared Cross-modal Embedding with a set of shared learnable embeddings to bridge the gap between these two modalities, and employ a caption generation task to further enhance the alignment. Furthermore, there lack of well-formed retrieval datasets for effective evaluation. To this end, we establish a multi-level retrieval dataset, nuScenes-Retrieval, based on the widely adopted nuScenes dataset. Experimental results on the multi-level nuScenes-Retrieval show that BEV-TSR achieves state-of-the-art performance, e.g., 85.78% and 87.66% top-1 accuracy on scene-to-text and text-to-scene retrieval respectively. Codes and datasets will be available.",
+                    "authors": [
+                      "Tao Tang",
+                      "Dafeng Wei",
+                      "Zhengyu Jia",
+                      "Tian Gao",
+                      "Changwei Cai",
+                      "Chengkai Hou",
+                      "Peng Jia",
+                      "Kun Zhan",
+                      "Haiyang Sun",
+                      "Jingchen Fan",
+                      "Yixing Zhao",
+                      "Fu Liu",
+                      "Xiaodan Liang",
+                      "Xianpeng Lang",
+                      "Yang Wang"
+                    ],
+                    "published": "2024-01-02T06:56:23Z",
+                    "updated": "2024-06-18T04:20:51Z",
+                    "url": "http://arxiv.org/abs/2401.01065v2",
+                    "pdf_url": "https://arxiv.org/pdf/2401.01065v2",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CV",
+                    "categories": [
+                      "cs.CV",
+                      "cs.AI"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2503.13861v1",
+                    "title": "RAD: Retrieval-Augmented Decision-Making of Meta-Actions with Vision-Language Models in Autonomous Driving",
+                    "summary": "Accurately understanding and deciding high-level meta-actions is essential for ensuring reliable and safe autonomous driving systems. While vision-language models (VLMs) have shown significant potential in various autonomous driving tasks, they often suffer from limitations such as inadequate spatial perception and hallucination, reducing their effectiveness in complex autonomous driving scenarios. To address these challenges, we propose a retrieval-augmented decision-making (RAD) framework, a novel architecture designed to enhance VLMs' capabilities to reliably generate meta-actions in autonomous driving scenes. RAD leverages a retrieval-augmented generation (RAG) pipeline to dynamically improve decision accuracy through a three-stage process consisting of the embedding flow, retrieving flow, and generating flow. Additionally, we fine-tune VLMs on a specifically curated dataset derived from the NuScenes dataset to enhance their spatial perception and bird's-eye view image comprehension capabilities. Extensive experimental evaluations on the curated NuScenes-based dataset demonstrate that RAD outperforms baseline methods across key evaluation metrics, including match accuracy, and F1 score, and self-defined overall score, highlighting its effectiveness in improving meta-action decision-making for autonomous driving tasks.",
+                    "authors": [
+                      "Yujin Wang",
+                      "Quanfeng Liu",
+                      "Zhengxin Jiang",
+                      "Tianyi Wang",
+                      "Junfeng Jiao",
+                      "Hongqing Chu",
+                      "Bingzhao Gao",
+                      "Hong Chen"
+                    ],
+                    "published": "2025-03-18T03:25:57Z",
+                    "updated": "2025-03-18T03:25:57Z",
+                    "url": "http://arxiv.org/abs/2503.13861v1",
+                    "pdf_url": "https://arxiv.org/pdf/2503.13861v1",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CV",
+                    "categories": [
+                      "cs.CV",
+                      "cs.AI"
+                    ]
+                  }
+                ],
+                "rate_limit_note": "arXiv may return 429 if called too frequently; this tool waits at least 3 seconds between requests in-process."
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "assistant_text": "Based on the provided arXiv results, here is a digest of the key findings from the listed papers:\n\n1. **SearchAD (2026-04-09)**  \n   - Focuses on semantic image retrieval for autonomous driving, with a well-defined data split.  \n   - Text-based methods outperform image-based ones due to stronger semantic grounding.  \n   - A fine-tuning baseline improves performance but still faces challenges in absolute retrieval.  \n   - Dataset: https://iis-esslingen.github.io/searchad/  \n\n2. **Spatial Retrieval Augmented Autonomous Driving (2025-12-07)**  \n   - Addresses limitations of onboard sensors in autonomous driving, such as perception horizon and visibility.  \n   - Proposes the spatial retrieval paradigm using offline geographic images from caches (e.g., Google Maps).  \n   - Extends the nuScenes dataset with geographic images and evaluates five core autonomous driving tasks.  \n   - Open-sources dataset curation code, data, and benchmarks.  \n\n3. **BEV-TSR (2024-01-02)**  \n   - Introduces BEV-TSR, a framework for text-scene retrieval in bird's-eye view (BEV) space.  \n   - Uses descriptive text as input to retrieve scenes and incorporates large language models and knowledge graphs.  \n   - Achieves state-of-the-art performance on nuScenes-Retrieval with top-1 accuracy of 85.78% and 87.66%.  \n   - Codes and datasets available.  \n\n4. **RAD (2025-03-18)**  \n   - Proposes a retrieval-augmented decision-making (RAD) framework for meta-actions in autonomous driving.  \n   - Uses a three-stage RAG pipeline to improve decision accuracy.  \n   - Fine-tunes VLMs on a curated NuScenes dataset to enhance spatial perception and bird's-eye view comprehension.  \n   - Outperforms baseline methods in match accuracy, F1 score, and self-defined overall score.  \n\nThese papers highlight advancements in autonomous driving, particularly in semantic image retrieval, spatial reasoning, and model fine-tuning for complex driving scenarios. The datasets and methodologies presented are critical for future research in autonomous driving and multi-modal retrieval.",
+          "tool_calls": [],
+          "tool_results": []
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "autonomous drive image retrieval"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "query": "autonomous drive image retrieval",
+            "api_query": "all:autonomous AND all:drive AND all:image AND all:retrieval",
+            "total_results": 70,
+            "items": [
+              {
+                "arxiv_id": "2508.00589v2",
+                "title": "Context-based Motion Retrieval using Open Vocabulary Methods for Autonomous Driving",
+                "summary": "Autonomous driving systems must operate reliably in safety-critical scenarios, particularly those involving unusual or complex behavior by Vulnerable Road Users (VRUs). Identifying these edge cases in driving datasets is essential for robust evaluation and generalization, but retrieving such rare human behavior scenarios within the long tail of large-scale datasets is challenging. To support targeted evaluation of autonomous driving systems in diverse, human-centered scenarios, we propose a novel context-aware motion retrieval framework. Our method combines Skinned Multi-Person Linear (SMPL)-based motion sequences and corresponding video frames before encoding them into a shared multimodal embedding space aligned with natural language. Our approach enables the scalable retrieval of human behavior and their context through text queries. This work also introduces our dataset WayMoCo, an extension of the Waymo Open Dataset. It contains automatically labeled motion and scene context descriptions derived from generated pseudo-ground-truth SMPL sequences and corresponding image data. Our approach outperforms state-of-the-art models by up to 27.5% accuracy in motion-context retrieval, when evaluated on the WayMoCo dataset.",
+                "authors": [
+                  "Stefan Englmeier",
+                  "Max A. Büttner",
+                  "Katharina Winter",
+                  "Fabian B. Flohr"
+                ],
+                "published": "2025-08-01T12:41:52Z",
+                "updated": "2025-08-12T09:43:48Z",
+                "url": "http://arxiv.org/abs/2508.00589v2",
+                "pdf_url": "https://arxiv.org/pdf/2508.00589v2",
+                "source": "arxiv.org",
+                "primary_category": "cs.CV",
+                "categories": [
+                  "cs.CV",
+                  "cs.CL",
+                  "cs.IR",
+                  "cs.RO"
+                ]
+              },
+              {
+                "arxiv_id": "2604.08008v1",
+                "title": "SearchAD: Large-Scale Rare Image Retrieval Dataset for Autonomous Driving",
+                "summary": "Retrieving rare and safety-critical driving scenarios from large-scale datasets is essential for building robust autonomous driving (AD) systems. As dataset sizes continue to grow, the key challenge shifts from collecting more data to efficiently identifying the most relevant samples. We introduce SearchAD, a large-scale rare image retrieval dataset for AD containing over 423k frames drawn from 11 established datasets. SearchAD provides high-quality manual annotations of more than 513k bounding boxes covering 90 rare categories. It specifically targets the needle-in-a-haystack problem of locating extremely rare classes, with some appearing fewer than 50 times across the entire dataset. Unlike existing benchmarks, which focused on instance-level retrieval, SearchAD emphasizes semantic image retrieval with a well-defined data split, enabling text-to-image and image-to-image retrieval, few-shot learning, and fine-tuning of multi-modal retrieval models. Comprehensive evaluations show that text-based methods outperform image-based ones due to stronger inherent semantic grounding. While models directly aligning spatial visual features with language achieve the best zero-shot results, and our fine-tuning baseline significantly improves performance, absolute retrieval capabilities remain unsatisfactory. With a held-out test set on a public benchmark server, SearchAD establishes the first large-scale dataset for retrieval-driven data curation and long-tail perception research in AD: https://iis-esslingen.github.io/searchad/",
+                "authors": [
+                  "Felix Embacher",
+                  "Jonas Uhrig",
+                  "Marius Cordts",
+                  "Markus Enzweiler"
+                ],
+                "published": "2026-04-09T09:10:41Z",
+                "updated": "2026-04-09T09:10:41Z",
+                "url": "http://arxiv.org/abs/2604.08008v1",
+                "pdf_url": "https://arxiv.org/pdf/2604.08008v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.CV",
+                "categories": [
+                  "cs.CV",
+                  "cs.AI",
+                  "cs.LG"
+                ]
+              },
+              {
+                "arxiv_id": "2512.06865v1",
+                "title": "Spatial Retrieval Augmented Autonomous Driving",
+                "summary": "Existing autonomous driving systems rely on onboard sensors (cameras, LiDAR, IMU, etc) for environmental perception. However, this paradigm is limited by the drive-time perception horizon and often fails under limited view scope, occlusion or extreme conditions such as darkness and rain. In contrast, human drivers are able to recall road structure even under poor visibility. To endow models with this ``recall\" ability, we propose the spatial retrieval paradigm, introducing offline retrieved geographic images as an additional input. These images are easy to obtain from offline caches (e.g, Google Maps or stored autonomous driving datasets) without requiring additional sensors, making it a plug-and-play extension for existing AD tasks. For experiments, we first extend the nuScenes dataset with geographic images retrieved via Google Maps APIs and align the new data with ego-vehicle trajectories. We establish baselines across five core autonomous driving tasks: object detection, online mapping, occupancy prediction, end-to-end planning, and generative world modeling. Extensive experiments show that the extended modality could enhance the performance of certain tasks. We will open-source dataset curation code, data, and benchmarks for further study of this new autonomous driving paradigm.",
+                "authors": [
+                  "Xiaosong Jia",
+                  "Chenhe Zhang",
+                  "Yule Jiang",
+                  "Songbur Wong",
+                  "Zhiyuan Zhang",
+                  "Chen Chen",
+                  "Shaofeng Zhang",
+                  "Xuanhe Zhou",
+                  "Xue Yang",
+                  "Junchi Yan",
+                  "Yu-Gang Jiang"
+                ],
+                "published": "2025-12-07T14:40:49Z",
+                "updated": "2025-12-07T14:40:49Z",
+                "url": "http://arxiv.org/abs/2512.06865v1",
+                "pdf_url": "https://arxiv.org/pdf/2512.06865v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.CV",
+                "categories": [
+                  "cs.CV"
+                ]
+              },
+              {
+                "arxiv_id": "2401.01065v2",
+                "title": "BEV-TSR: Text-Scene Retrieval in BEV Space for Autonomous Driving",
+                "summary": "The rapid development of the autonomous driving industry has led to a significant accumulation of autonomous driving data. Consequently, there comes a growing demand for retrieving data to provide specialized optimization. However, directly applying previous image retrieval methods faces several challenges, such as the lack of global feature representation and inadequate text retrieval ability for complex driving scenes. To address these issues, firstly, we propose the BEV-TSR framework which leverages descriptive text as an input to retrieve corresponding scenes in the Bird's Eye View (BEV) space. Then to facilitate complex scene retrieval with extensive text descriptions, we employ a large language model (LLM) to extract the semantic features of the text inputs and incorporate knowledge graph embeddings to enhance the semantic richness of the language embedding. To achieve feature alignment between the BEV feature and language embedding, we propose Shared Cross-modal Embedding with a set of shared learnable embeddings to bridge the gap between these two modalities, and employ a caption generation task to further enhance the alignment. Furthermore, there lack of well-formed retrieval datasets for effective evaluation. To this end, we establish a multi-level retrieval dataset, nuScenes-Retrieval, based on the widely adopted nuScenes dataset. Experimental results on the multi-level nuScenes-Retrieval show that BEV-TSR achieves state-of-the-art performance, e.g., 85.78% and 87.66% top-1 accuracy on scene-to-text and text-to-scene retrieval respectively. Codes and datasets will be available.",
+                "authors": [
+                  "Tao Tang",
+                  "Dafeng Wei",
+                  "Zhengyu Jia",
+                  "Tian Gao",
+                  "Changwei Cai",
+                  "Chengkai Hou",
+                  "Peng Jia",
+                  "Kun Zhan",
+                  "Haiyang Sun",
+                  "Jingchen Fan",
+                  "Yixing Zhao",
+                  "Fu Liu",
+                  "Xiaodan Liang",
+                  "Xianpeng Lang",
+                  "Yang Wang"
+                ],
+                "published": "2024-01-02T06:56:23Z",
+                "updated": "2024-06-18T04:20:51Z",
+                "url": "http://arxiv.org/abs/2401.01065v2",
+                "pdf_url": "https://arxiv.org/pdf/2401.01065v2",
+                "source": "arxiv.org",
+                "primary_category": "cs.CV",
+                "categories": [
+                  "cs.CV",
+                  "cs.AI"
+                ]
+              },
+              {
+                "arxiv_id": "2503.13861v1",
+                "title": "RAD: Retrieval-Augmented Decision-Making of Meta-Actions with Vision-Language Models in Autonomous Driving",
+                "summary": "Accurately understanding and deciding high-level meta-actions is essential for ensuring reliable and safe autonomous driving systems. While vision-language models (VLMs) have shown significant potential in various autonomous driving tasks, they often suffer from limitations such as inadequate spatial perception and hallucination, reducing their effectiveness in complex autonomous driving scenarios. To address these challenges, we propose a retrieval-augmented decision-making (RAD) framework, a novel architecture designed to enhance VLMs' capabilities to reliably generate meta-actions in autonomous driving scenes. RAD leverages a retrieval-augmented generation (RAG) pipeline to dynamically improve decision accuracy through a three-stage process consisting of the embedding flow, retrieving flow, and generating flow. Additionally, we fine-tune VLMs on a specifically curated dataset derived from the NuScenes dataset to enhance their spatial perception and bird's-eye view image comprehension capabilities. Extensive experimental evaluations on the curated NuScenes-based dataset demonstrate that RAD outperforms baseline methods across key evaluation metrics, including match accuracy, and F1 score, and self-defined overall score, highlighting its effectiveness in improving meta-action decision-making for autonomous driving tasks.",
+                "authors": [
+                  "Yujin Wang",
+                  "Quanfeng Liu",
+                  "Zhengxin Jiang",
+                  "Tianyi Wang",
+                  "Junfeng Jiao",
+                  "Hongqing Chu",
+                  "Bingzhao Gao",
+                  "Hong Chen"
+                ],
+                "published": "2025-03-18T03:25:57Z",
+                "updated": "2025-03-18T03:25:57Z",
+                "url": "http://arxiv.org/abs/2503.13861v1",
+                "pdf_url": "https://arxiv.org/pdf/2503.13861v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.CV",
+                "categories": [
+                  "cs.CV",
+                  "cs.AI"
+                ]
+              }
+            ],
+            "rate_limit_note": "arXiv may return 429 if called too frequently; this tool waits at least 3 seconds between requests in-process."
+          }
+        }
+      ],
+      "ended_at": "2026-11-10T19:05:33"
+    }
+  ],
+  "updated_at": "2026-11-10T19:05:33"
+}
