@@ -99,7 +99,18 @@ Liệt kê đúng 10 case trong `starter_v0/data/eval_group.json` (5 single turn
 
 | Case ID | What It Tests | Expected Tool/Behavior | Result |
 |---|---|---|---|
-|  |  |  |  |
+| G01_lookup_exact_doi | DOI cụ thể route tới tool mới | `doi_lookup(doi="10.1038/nphys1170")` | PASS |
+| G02_internal_privacy_policy | Chính sách dữ liệu cá nhân nội bộ | `policy(policy_area="data_privacy")` | PASS |
+| G03_arxiv_recent_preprints | Tìm paper arXiv theo số lượng và ngày nộp | `papers(max_results=4, sort_by="submittedDate")` | PASS |
+| G04_format_existing_sources | Định dạng đủ hai nguồn người dùng đã đưa | `format(template="bullets", items=[2 nguồn])` | FAIL: thiếu `items` |
+| G05_translation_out_of_scope | Yêu cầu dịch thuật ngoài phạm vi | Không gọi tool | PASS |
+| G06_doi_correction_multiturn | Dùng DOI được sửa ở lượt sau | `doi_lookup(doi="10.1145/3290605.3300233")` | PASS |
+| G07_policy_area_switch_multiturn | Chuyển khu vực chính sách theo yêu cầu mới | `policy(policy_area="source_citation")` | PASS |
+| G08_social_sort_correction_multiturn | Giữ chủ đề và đổi Latest → Top | `social_search(query="robotics", search_type="Top")` | PASS |
+| G09_url_correction_multiturn | Chỉ đọc URL được sửa ở lượt sau | `fetch(url="https://en.wikipedia.org/wiki/Robotics")` | FAIL: gọi `format` với URL cũ |
+| G10_send_requires_confirmation_multiturn | Xin xác nhận trước khi gửi Telegram | `clarify(response_type="yes_no")` | PASS |
+
+Run group v5: `starter_v0/runs/v5_B_group_ollama_20261110T184051667335.json` — 10/10 case được đo, 0 provider error, 8/10 PASS; single turn 4/5, multi turn 4/5. Eval chấm tool call và args, không chứng minh output của API luôn đúng. Ví dụ G04 ban đầu chỉ kiểm tra tên tool nên pass dù thiếu `items`; sau khi bổ sung args cần kiểm tra, case bắt được lỗi này. Unit test `doi_lookup` còn kiểm tra HTTP 429 trả error dict, điều mà eval routing không đo.
 
 ### B4. Live Chat Evidence
 
