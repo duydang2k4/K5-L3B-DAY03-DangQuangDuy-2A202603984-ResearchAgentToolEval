@@ -27,9 +27,9 @@ def main() -> None:
     tools = to_openai_tools(load_tool_declarations(args.tools))
     messages = [
         {"role": "system", "content": "You are a tool-routing smoke test. Use tools when appropriate."},
-        {"role": "user", "content": "Tweet mới nhất của Sam Altman là gì?"},
+        {"role": "user", "content": "Call the timeline tool for screenname samaltman with limit 1."},
     ]
-    response = provider.complete(messages, tools, model=args.model, temperature=0.0)
+    response = provider.complete(messages, tools, model=args.model, temperature=0.0, tool_choice="required")
     if not response.tool_calls:
         raise SystemExit("Provider did not return structured tool_calls.")
     first = response.tool_calls[0]

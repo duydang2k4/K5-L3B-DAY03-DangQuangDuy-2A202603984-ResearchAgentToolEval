@@ -1,0 +1,2142 @@
+{
+  "run_id": "v1_B_base_ollama_20261110T180802788870",
+  "version": "v1",
+  "artifact_version": "v1+p4ed4092601d1+te69bc53ed884",
+  "prompt_hash": "4ed4092601d1d40c9f8ebc1aaae024800900641e331d01a08d87d6b52059e6ae",
+  "tools_hash": "e69bc53ed8846a5c2192e950c539806a61a6902b718f06d6773db6a42e9b996c",
+  "phase": "B",
+  "suite": "base",
+  "provider": "ollama",
+  "model": "qwen3:1.7b",
+  "system_prompt": "D:\\WORKSPACE\\K5-L3B-DAY03-DangQuangDuy-2A202603984-ResearchAgentToolEval\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "D:\\WORKSPACE\\K5-L3B-DAY03-DangQuangDuy-2A202603984-ResearchAgentToolEval\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_base.json",
+  "dataset_id": "day03_v2_research_base",
+  "dataset_role": "base",
+  "description": "Core eval cho research agent: routing đúng tool + đúng args, hỏi lại khi thiếu (ask_user), xác nhận trước khi gửi, và xử lý câu ngoài phạm vi / không cần tool. Chấm trên tool_calls + args (subset). KHÔNG sửa file này — chỉ thêm case vào eval_group.json.",
+  "generated_at": "2026-11-10T18:08:02",
+  "summary": {
+    "total_cases": 20,
+    "measured_cases": 20,
+    "provider_error_cases": 0,
+    "passed_cases": 4,
+    "case_accuracy": 0.2,
+    "tool_routing_accuracy": 0.4,
+    "argument_accuracy": 0.2,
+    "multiturn_accuracy": 0.0,
+    "failure_counts": {
+      "wrong_tool": 5,
+      "wrong_arg_value": 4,
+      "out_of_scope": 2,
+      "missing_info": 4,
+      "wrong_boundary": 1
+    },
+    "observed_mismatch_counts": {
+      "wrong_arg_value": 4,
+      "missing_tool_call": 10,
+      "unexpected_tool_call": 2
+    }
+  },
+  "results": [
+    {
+      "id": "R01_user_tweets_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_user_tweets_name_to_handle",
+        "difficulty": "medium",
+        "what_it_tests": "Tin CỦA một người nổi tiếng → map tên Sam Altman thành handle sama rồi gọi get_user_tweets."
+      },
+      "input": "Tweet mới nhất của Sam Altman là gì?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "sama"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "Sam Altman",
+              "limit": 1
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "screenname: expected 'sama', got 'Sam Altman'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "Sam Altman",
+            "limit": 1
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "JSONDecodeError",
+            "message": "Expecting value: line 1 column 1 (char 0)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "R02_search_tweets_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_search_tweets",
+        "difficulty": "easy",
+        "what_it_tests": "Tweet theo CHỦ ĐỀ → search_tweets, không phải get_user_tweets."
+      },
+      "input": "Mọi người đang bàn gì về GPT-5 trên Twitter?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "Twitter",
+              "limit": 5
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "missing tool call social_search",
+          "extra tool call timeline"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "Twitter",
+            "limit": 5
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "JSONDecodeError",
+            "message": "Expecting value: line 1 column 1 (char 0)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "R03_web_news_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_web_news",
+        "difficulty": "medium",
+        "what_it_tests": "Tin thời sự trên web → web_search topic=news, timeframe=day (hôm nay)."
+      },
+      "input": "Tin tức AI hôm nay có gì nổi bật?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "Tin tức AI hôm nay",
+              "search_type": "Latest"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "missing tool call lookup",
+          "extra tool call social_search"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "Tin tức AI hôm nay",
+            "search_type": "Latest"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "Tin tức AI hôm nay",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "QUỐC HỘI BƯỚC VÀO TUẦN CHẤT VẤN: AI PHẢI TRẢ LỜI NHỮNG VẤN ĐỀ NGƯỜI DÂN CHỜ ĐỢI?",
+                "summary": "QUỐC HỘI BƯỚC VÀO TUẦN CHẤT VẤN: AI PHẢI TRẢ LỜI NHỮNG VẤN ĐỀ NGƯỜI DÂN CHỜ ĐỢI?\n\nTừ ngày 9–13/11/2026, Quốc hội khóa XVI bước vào tuần làm việc thứ năm của Kỳ họp thứ hai. Đáng chú ý, ngày 12/11 sẽ diễn ra phiên chất vấn và trả lời chất vấn, với hai lĩnh vực trọng tâm là tài chính và khoa học – công nghệ. Hai người trả lời chính là Bộ trưởng Bộ Tài chính Ngô Văn Tuấn và Bộ trưởng Bộ Khoa học và Công nghệ Vũ Hải Quân; Thủ tướng hoặc Phó Thủ tướng được ủy quyền cũng sẽ trực tiếp trả lời chất vấn.\n\nĐây không chỉ là một phiên họp thường kỳ. Đó là dịp để những vấn đề tồn đọng lâu nay được đưa ra trước Quốc hội, nơi các bộ trưởng phải giải trình về chính sách, tiến độ và trách nhiệm quản lý. Nhưng điều người dân chờ đợi không đơn thuần là những câu trả lời tròn trịa, mà là lời giải cho những vấn đề đã được phản ánh nhiều lần nhưng vẫn chưa có chuyển biến rõ rệt.\n\nVới Bộ trưởng Bộ Tài chính, câu hỏi lớn nhất là: Vì sao tiền ngân sách đã bố trí nhưng nhiều công trình vẫn chậm tiến độ, trong khi người dân tiếp tục phải chờ những hạ tầng thiết yếu?\n\nHàng loạt dự án đầu tư công kéo dài, đội vốn, chậm giải ngân đã trở thành câu chuyện không mới. Ngay tại Nghệ An, dự án tái định cư Châu Khê được phê duyệt từ năm 2011 với tổng vốn hơn 63,5 tỷ đồng, nhưng sau 15 năm vẫn chưa hoàn thành. Nhiều hạng mục thiết yếu như đường giao thông, thoát nước, điện và công trình công cộng còn dang dở. Người dân vùng có nguy cơ sạt lở vẫn phải chờ nơi ở an toàn. Đây là ví dụ điển hình cho câu hỏi về hiệu quả sử dụng vốn đầu tư công: tiền đã được đưa vào dự án, nhưng mục tiêu phục vụ người dân vẫn chưa đạt được.\n\nVấn đề càng đáng chú ý khi theo báo cáo của Bộ Tài chính, đến hết tháng 10/2026, tổng vốn đầu tư công đã giải ngân đạt 708.567 tỷ đồng, tương đương 74,1% kế hoạch Thủ tướng giao. Như vậy, vẫn còn khoảng 247.300 tỷ đồng chưa được giải ngân.\n\nĐáng nói, Bộ Khoa học và Công nghệ nằm trong nhóm cơ quan có tỷ lệ giải ngân dưới 15%, thậm chí được chấm 38,47/100 điểm về kết quả giải ngân kế hoạch vốn năm 2026.\n\nVì sao ngân sách dành cho phát triển vẫn còn đó, trong khi nhiều địa phương, đơn vị và người dân đang cần những công trình thiết yếu? Ai chịu trách nhiệm khi vốn được phân bổ nhưng dự án không thể triển khai đúng tiến độ?\nVới Bộ trưởng Bộ Khoa học và Công nghệ, vấn đề không chỉ là chuyển đổi số hay phát triển trí tuệ nhân tạo, mà còn là hiệu quả thực chất của những khoản đầu tư cho khoa học.\n\nTheo thông tin được công bố, nguồn thu từ hoạt động khoa học, công nghệ mới chiếm khoảng 4,94% tổng nguồn thu của các trường đại học. Trong danh mục hơn 1.000 sản phẩm công nghệ của 41 đơn vị, mới có 334 sản phẩm đạt mức sẵn sàng chuyển giao từ cấp độ 7-9; còn 484 sản phẩm chưa xác định được mức độ sẵn sàng. Điều đó đặt ra câu hỏi về khoảng cách giữa nghiên cứu trong phòng thí nghiệm và sản phẩm thực sự phục vụ đời sống, sản xuất.\n\nChưa kể, chuyển đổi số vẫn là nỗi vất vả của không ít người dân: dữ liệu chưa liên thông, phần mềm phân tán, thủ tục trực tuyến nhưng vẫn phải bổ sung giấy tờ, đi lại nhiều lần. AI được kỳ vọng tạo đột phá, nhưng vấn đề bảo vệ dữ liệu cá nhân, an toàn thông tin và trách nhiệm khi công nghệ gây ra sai sót cũng không thể xem nhẹ.\n\nMột phiên chất vấn chỉ diễn ra trong một ngày, nhưng những vấn đề được đưa ra đã tồn tại qua nhiều năm. Vì vậy, điều cử tri cần theo dõi không chỉ là bộ trưởng trả lời thế nào, mà còn là sau chất vấn, bao nhiêu dự án được tháo gỡ, bao nhiêu đồng vốn được sử dụng hiệu quả, bao nhiêu thủ tục được đơn giản hóa và bao nhiêu cam kết được thực hiện.\n\nTheo mọi người, sau mỗi phiên chất vấn, Quốc hội cần có cơ chế nào để theo dõi đến cùng việc thực hiện cam kết của bộ trưởng, thay vì để những vấn đề người dân phản ánh hôm nay tiếp tục trở thành nội dung chất vấn ở những kỳ họp năm sau?\n\nSan San\n\n#chatvan #traloidan #quochoi #chantroimoi",
+                "url": "https://x.com/chantmmedia/status/2120094122664984942",
+                "source": "@chantmmedia",
+                "date": "Tue Nov 10 10:00:02 +0000 2026",
+                "metrics": {
+                  "favorites": 1,
+                  "retweets": 0,
+                  "views": "32"
+                }
+              },
+              {
+                "title": "🇻🇳 Những lời dạy của Chúa Giê-su Ki-tô giúp con người đạt được sự khôn ngoan thiêng liêng ",
+                "summary": "🇻🇳 Những lời dạy của Chúa Giê-su Ki-tô giúp con người đạt được sự khôn ngoan thiêng liêng \nNhững lời dạy của Chúa Kitô liệu còn phù hợp với thời đại chúng ta? 👇\nhttps://t.co/kECzkrp4E1\nHãy ngừng xét đoán để không bị xét đoán\n\n« Đừng xét đoán nữa để anh em không bị xét đoán; 2 vì anh em xét đoán người ta thể nào thì sẽ bị xét đoán thể ấy, và anh em đong cho người ta bằng lường nào thì người ta sẽ đong lại cho anh em bằng lường ấy. 3 Sao con thấy cọng rơm trong mắt anh em mình mà lại không để ý đến khúc gỗ trong mắt chính mình? 4 Sao con có thể nói với anh em: ‘Để tôi lấy cọng rơm ra khỏi mắt anh’, trong khi có khúc gỗ trong mắt con? 5 Hỡi kẻ đạo đức giả! Hãy lấy khúc gỗ ra khỏi mắt mình trước đã, rồi con mới thấy rõ cách lấy cọng rơm ra khỏi mắt anh em con » (Ma-thi-ơ 7:1-5).\n\nLời khuyên răn không được xét đoán này cần được đặt trong bối cảnh các mối quan hệ nhân sinh nói chung, chứ không phải trong khuôn khổ bình thường của một tòa án vốn đòi hỏi sự can thiệp của một thẩm phán để phán quyết xem một người có tội hay không.\n\nChúa Giê-su Ki-tô nói rằng người nào có xu hướng luôn xét đoán người lân cận của mình thì thường quên mất rằng chính họ cũng đang ở trong tình cảnh hoàn toàn giống như người mà họ xét đoán: họ cũng là người tội lỗi như tất cả những hậu duệ khác của A-đam: “Vì mọi người đều đã phạm tội và thiếu mất sự vinh hiển của Đức Chúa Trời” (Rô-ma 3:23). Chúa Giê-su Ki-tô bổ sung thêm điểm thứ hai cho thấy người xét đoán đang tự đặt mình vào một tình thế rất nhạy cảm trước mặt Đấng sẽ thực thi sự phán xét—chính là Vua Giê-su Ki-tô, đặc biệt là ngay trước kỳ hoạn nạn lớn: người đó sẽ bị xét đoán theo đúng cách mà họ đã xét đoán người khác. Vì vậy, việc không xét đoán, khi nhìn từ góc độ này, là một cách hành xử khôn ngoan. Tuy nhiên, trước đó trong bài giảng của mình, Chúa Giê-su Ki-tô đã nói rằng chúng ta phải thương xót thì mới được thương xót. Chúng ta phải tha thứ thì Đức Chúa Trời mới tha thứ lỗi lầm cho chúng ta (Ma-thi-ơ 5:7; 6:14,15).\n\nTuy nhiên, Chúa Giê-su Ki-tô còn đi xa hơn nhiều đối với những ai có xu hướng xét đoán người lân cận, ngài nói không chút do dự rằng người đó là kẻ đạo đức giả. Thật vậy, họ xét đoán người lân cận mà lại phớt lờ việc bản thân mình cũng có những khuyết điểm, thậm chí là nghiêm trọng hơn nhiều; Chúa Giê-su Ki-tô nói rằng người bị xét đoán chỉ có một cọng rơm nhỏ trong mắt, trong khi dưới hiệu ứng thị giác, kẻ xét đoán lại có cả một khúc gỗ trong mắt mình. Câu nói của Đấng Ki-tô hoàn toàn phù hợp với người thường xuyên xét đoán người lân cận: “Hỡi thầy thuốc, hãy tự chữa bệnh cho mình đi” (Lu-ca 4:23).\n\nĐừng cho chó những đồ thánh\n\n« Đừng cho chó những đồ thánh, cũng đừng quăng ngọc trai mình trước mặt heo, kẻo chúng giày đạp dưới chân, rồi quay lại cắn xé anh em » (Ma-thi-ơ 7:6).\n\nRõ ràng, chó và heo tượng trưng cho những con người xác thịt có lối cư xử hoàn toàn không mang tính tâm linh (1 Cô-rinh-tô 2:16). Tuy nhiên, trong trường hợp cụ thể này, Chúa Giê-su Ki-tô giải thích rằng những con người này có thể gây ra thương tích, thậm chí là cái chết. Những gì là “thánh” hay “ngọc trai” là các ân phước tâm linh liên quan đến thánh chức mà chúng ta dâng lên Đức Chúa Trời, trong đó có việc công bố tin mừng và dạy dỗ Kinh Thánh. Trong khuôn khổ của thánh chức rao giảng Lời Chúa, người Cơ Đốc phải thể hiện sự khôn ngoan, sáng suốt và hiểu rõ thời điểm nào thì không nên cố chấp nài ép: “Này! Tôi sai anh em đi như chiên ở giữa bầy muông sói; vậy hãy khôn ngoan như rắn và ngây thơ như bồ câu” (Ma-thi-ơ 10:16).\n\nTất cả những người tạm thời từ chối lắng nghe tin mừng, hoặc những người có quan điểm cơ bản là khác biệt với chúng ta hoặc với Lời Đức Chúa Trời, không thuộc vào nhóm người được Chúa Giê-su Ki-tô đề cập ở đây. Chính ngài cũng từng tiếp xúc với những người tội lỗi nhằm mục đích đưa họ trở lại con đường đúng đắn: “Tôi đến không phải để kêu gọi người công chính, mà là kêu gọi người có tội ăn năn” (Lu-ca 5:27-32). Trong một số tôn giáo hoặc hội thánh, các tín đồ Cơ Đốc bị dứt phép thông công (khai trừ) chỉ vì có quan điểm khác biệt về giáo điều hoặc cách giải thích Kinh Thánh. Trong khi những người Cơ Đốc này bị xếp vào hàng ngũ những kẻ bội đạo, một số người thậm chí còn gọi họ là “chó” và “heo”, mặc dù hành vi của họ không hề có tính chất nguy hiểm như Chúa Giê-su Ki-tô đã đề cập, tức là có khả năng gây thương tích hoặc đe dọa đến mạng sống của chính những kẻ sỉ nhục họ.\n\nLiên quan đến tình cảnh đau lòng này, đặc biệt là đối với những người bị tẩy chay bởi toàn bộ các hội thánh, mọi sự đều nằm trong tay của Vua Giê-su Ki-tô vào thời điểm phán xét các hội thánh Cơ Đốc, ngay trước khi hội tụ (Ma-thi-ơ 25). Đối với những người không ngần ngại sỉ nhục họ, theo Ma-thi-ơ 7:1-4 và cả Ma-thi-ơ 5:22, họ đang tự đặt mình vào một tình thế cực kỳ nguy hiểm. Bởi vì nếu (những) người bị tẩy chay đó được chứng minh là vô tội và danh tiếng tốt của họ được khôi phục vào ngày phán xét, thì điều gì sẽ xảy ra với những kẻ đã nhục mạ họ một cách nghiêm trọng? Dưới đây là một đoạn văn trong lời tiên tri của Ê-sai, là lời khích lệ cho những người giữ lòng trung kiên trước mặt Đức Chúa Trời đang phải trải qua tình cảnh rất đau đớn này: “Hãy nghe lời Đức Giê-hô-va, hỡi những người run sợ trước lời Ngài: ‘Anh em các ngươi, là những kẻ ghét các ngươi và ruồng bỏ các ngươi vì cớ danh ta, đã nói: “Nguyện Đức Giê-hô-va được tôn vinh!”. Nhưng Ngài sẽ hiện ra đem lại niềm vui cho các ngươi, còn chúng sẽ bị hổ thẹn’” (Ê-sai 66:5). Nếu bạn trung thành với Đức Chúa Trời và Chúa Giê-su Ki-tô và tiếp tục giữ vững điều đó, Đức Chúa Trời sẽ tể trị để khôi phục lại danh tiếng tốt mà bạn vốn đã có trước mặt Ngài, và lần này là ngay trước mặt những kẻ làm tổn hại đến phẩm giá con người của bạn:\n\n« Tuy nhiên, tôi nói với anh em: Bất cứ ai tiếp tục giận anh em mình sẽ phải trả lời trước tòa án; còn ai dùng lời lẽ khinh miệt không thể chấp nhận được mà nhục mạ anh em mình sẽ phải trả lời trước Tòa tối cao; còn ai nói: ‘Đồ điên rồ đáng khinh!’ sẽ có nguy cơ bị quăng vào lửa Ge-hen-na » (Ma-thi-ơ 5:22).\n\nHãy tiếp tục xin thì sẽ được ban cho\n\n« 7 Hãy tiếp tục xin thì sẽ được ban cho; hãy tiếp tục tìm thì sẽ gặp; hãy tiếp tục gõ cửa thì cửa sẽ mở cho. 8 Vì ai xin thì nhận được, ai tìm thì gặp, và ai gõ cửa thì cửa sẽ mở cho. 9 Có ai trong anh em khi con mình xin bánh lại cho nó một hòn đá chăng? 10 Hoặc con xin cá lại cho nó một con rắn chăng? 11 Vậy nếu anh em là người xấu còn biết cho con cái mình những vật tốt, huống chi Cha anh em ở trên trời lại chẳng ban những vật tốt cho những người cầu xin Ngài sao! » (Ma-thi-ơ 7:7-11).\n\nChúa Giê-su Ki-tô dạy rằng nếu chúng ta muốn nhận được ân phước của Đức Chúa Trời, chúng ta phải kiên trì và bền lòng trong lời cầu nguyện. Trong một minh họa khác, ngài đã cho thấy cách một góa phụ, nhờ kiên trì nài xin một quan tòa bất chính, cuối cùng đã được vị đó thực thi công lý cho mình: « Ngài kể cho họ nghe một minh họa để cho thấy họ cần phải cầu nguyện luôn mà không nản lòng. Ngài phán: “Trong thành nọ có một quan tòa không kính sợ Đức Chúa Trời cũng chẳng nể trọng ai. Trong thành đó cũng có một góa phụ cứ đến gặp ông ấy và thưa rằng: ‘Xin giải oan cho tôi trước kẻ thù’. Một thời gian dài ông từ chối, nhưng sau đó tự bảo: ‘Dù mình không kính sợ Đức Chúa Trời cũng chẳng nể trọng ai, nhưng vì bà góa này cứ làm phiền mình mãi, nên mình sẽ giải oan cho bà, kẻo bà cứ đến hoài làm mình nhức đầu’. Rồi Chúa phán: ‘Hãy nghe những gì vị quan tòa bất chính đó đã nói! Vậy, Đức Chúa Trời lại chẳng giải oan cho những người được chọn của Ngài, là những người ngày đêm kêu van Ngài sao, dù Ngài có kiên nhẫn với họ? Tôi nói với anh em, Ngài sẽ nhanh chóng giải oan cho họ. Tuy nhiên, khi Con Người đến, liệu ngài có tìm thấy đức tin như vậy trên trái đất không?’” » (Lu-ca 18:1-8).\n\nQuy tắc vàng\n\n« Vậy, bất cứ điều gì anh em muốn người ta làm cho mình, anh em cũng phải làm cho họ; vì đây là ý nghĩa của Luật Pháp và các Sách Tiên Tri » (Ma-thi-ơ 7:12).\n\nChúa Giê-su Ki-tô đưa ra điều răn cốt lõi nâng đỡ toàn bộ Luật Pháp và các Sách Tiên Tri, tức là luật pháp vương quyền của tình yêu thương, bởi vì ngài đã lặp lại chính xác cụm từ đó trong lời kết luận sau này: « “Thưa Thầy, trong Luật Pháp, điều răn nào là lớn nhất?”. Ngài đáp: “‘Ngươi phải yêu thương Giê-hô-va Đức Chúa Trời ngươi hết lòng, hết linh hồn và hết tâm trí’. Đây là điều răn lớn nhất và quan trọng nhất. Điều răn thứ hai cũng tương tự như vậy: ‘Ngươi phải yêu người lân cận như chính mình’. Toàn bộ Luật Pháp và các Sách Tiên Tri đều tùy thuộc vào hai điều răn này” » (Ma-thi-ơ 22:36-40; Gia-cơ 2:8).\n\nCũng về chủ đề yêu thương người lân cận, người ta đã đặt câu hỏi cho ngài về ý nghĩa cụ thể của từ “người lân cận”. Chúa Giê-su Ki-tô đã đưa ra một minh họa để đưa ra định nghĩa chính xác về từ này: « Nhưng vì muốn chứng tỏ mình là người công chính, người ấy hỏi Chúa Giê-su: “Ai thật sự là người lân cận của tôi?”. Chúa Giê-su đáp: “Một người kia đi từ Giê-ru-sa-lem xuống Giê-ri-cô thì rơi vào tay bọn cướp. Chúng lột quần áo, đánh đập rồi bỏ đi, để mặc người đó nửa sống nửa chết. Tình cờ, có một thầy tế lễ đi xuống đường đó, nhưng khi thấy người ấy thì đi vòng qua phía bên kia đường. Tương tự vậy, một người Lê-vi cũng đi đến nơi đó, thấy người ấy thì đi vòng qua phía bên kia đường. Nhưng có một người Sa-ma-ri đi đường ngang qua nơi người ấy nằm, thấy vậy thì động lòng trắc ẩn. Người Sa-ma-ri đến gần, xức dầu và rượu lên các vết thương rồi băng bó lại. Sau đó, người đặt nạn nhân lên lưng con vật của mình, đưa đến một quán trọ và chăm sóc người ấy. Ngày hôm sau, người lấy ra hai đơ-ni-ê đưa cho chủ quán trọ và bảo: ‘Hãy chăm sóc người này, nếu tốn kém hơn, khi trở lại tôi sẽ trả ông’. Theo ông, trong ba người đó, ai là người lân cận của người rơi vào tay bọn cướp?”. Người ấy đáp: “Người đã đối xử nhân từ với nạn nhân”. Chúa Giê-su bảo: “Hãy đi và làm y như vậy” » (Lu-ca 10:29-37).\n\nNhư vậy, đúng như Chúa Giê-su Ki-tô đã nhấn mạnh, quy tắc vàng phải được áp dụng một cách không phân biệt đối với tất cả những con người mà chúng ta tiếp xúc, bao gồm cả kẻ thù của chúng ta theo những gì được chép trong Ma-thi-ơ 5:43-48.\n\nHãy vào cửa hẹp\n\n« 13 Hãy vào cửa hẹp; vì cửa rộng và đường khoảng khoát dẫn đến sự hủy diệt, và có nhiều người vào đó; 14 còn cửa hẹp và đường chật dẫn đến sự sống, và ít người tìm được » (Ma-thi-ơ 7:13,14).\n\nChúa Giê-su Ki-tô đã nhiều lần chỉ ra rằng con đường dẫn đến sự sống đời đời sẽ không dễ dàng tiếp cận và bước đi, vì đó là một cánh cửa dẫn vào một con đường chật hẹp. Con đường dẫn đến sự hủy diệt thì không có hai khó khăn được đề cập này (cửa hẹp và đường chật), nó đơn giản là rộng rãi và dễ đi, không đòi hỏi bất kỳ nỗ lực nào.\n\nChúa Giê-su Ki-tô đã nhấn mạnh sự khó khăn của thánh chức Cơ Đốc bằng nhiều cách khác nhau, tương ứng với con đường không dễ tìm và không dễ đi này: « Này! Tôi sai anh em đi như chiên ở giữa bầy muông sói; vậy hãy khôn ngoan như rắn và ngây thơ như bồ câu. Hãy coi chừng người đời; vì họ sẽ nộp anh em cho các tòa án địa phương và đánh đòn anh em trong các nhà hội của họ. Phải, vì cớ tôi, anh em sẽ bị giải đến trước mặt các quan tổng đốc và vua chúa, để làm chứng cho họ cùng các dân ngoại » (Ma-thi-ơ 10:16-18).\n\nChúa Giê-su Ki-tô đã cho thấy rằng làm một người Cơ Đốc trong hệ thống mọi sự này sẽ không phải là điều dễ dàng và đòi hỏi một tinh thần quên mình: « Ai không vác cây cọc khổ hình của mình mà theo tôi thì không xứng đáng với tôi » (Ma-thi-ơ 10:38). Ngài cũng chỉ ra sự cần thiết phải bền chí chịu đựng cho đến cuối cùng để nhận được sự sống đời đời: « Nhưng ai bền chí chịu đựng cho đến cuối cùng sẽ được cứu » (Ma-thi-ơ 24:13).\n\nHãy cảnh giác với các kẻ tiên tri giả\n\n« 15 Hãy cảnh giác với các kẻ tiên tri giả, là những kẻ đến với anh em trong lốt chiên nhưng bên trong là muông sói tham tàn. 16 Anh em sẽ nhận biết chúng nhờ trái của chúng. Người ta chẳng bao giờ hái nho nơi bụi gai hoặc hái vả nơi bụi tật lê, phải không? 17 Cũng vậy, cây tốt thì sinh trái lành, còn cây hư thì sinh trái độc; 18 cây tốt không thể sinh trái độc, và cây hư cũng không thể sinh trái lành. 19 Bất cứ cây nào không sinh trái lành đều bị chặt và quăng vào lửa. 20 Cho nên, anh em sẽ nhận biết những kẻ ấy nhờ trái của chúng.\n\n21 “Không phải bất cứ ai gọi tôi: ‘Chúa ơi, Chúa ơi’ đều sẽ được vào vương quốc trên trời đâu, nhưng chỉ ai làm theo ý muốn của Cha tôi ở trên trời mà thôi. 22 Trong ngày đó, nhiều người sẽ nói với tôi: ‘Chúa ơi, Chúa ơi, chẳng phải chúng tôi đã nhân danh Chúa mà nói tiên tri, nhân danh Chúa mà đuổi quỷ và nhân danh Chúa mà làm nhiều phép lạ sao?’. 23 Nhưng bấy giờ tôi sẽ tuyên bố với họ: Tôi chẳng hề biết các người! Hãy lui ra cho khuất mắt tôi, hỡi những kẻ làm luật pháp gian ác (hành nghề bất pháp)” » (Ma-thi-ơ 7:15-23).\n\nChúa Giê-su Ki-tô nói rằng mối nguy hiểm của các kẻ tiên tri giả nằm ở khả năng lừa dối, mang một vẻ bề ngoài giống như những con chiên. Do đó, người ta không dễ dàng nhận diện chúng ngay qua những hành vi mang tính thao túng tâm lý để dụ dỗ, mà phải qua kết quả cuối cùng từ các hành động xấu xa của chúng. Những kết quả này sẽ chứng thực trên thực tế rằng chúng là những con muông sói tham tàn và nhẫn tâm, đang ngược đãi hội thánh Cơ Đốc. Chúa Giê-su Ki-tô nhấn mạnh đến tinh thần quan sát hoặc sự sáng suốt, điều sẽ giúp hiểu rõ rằng có một điều bất thường đang xảy ra khi có sự hiện diện của các kẻ tiên tri giả này, giống như việc người ta nhìn thấy trái nho trên bụi gai hay trái vả trên bụi tật lê vậy.\n\nSứ đồ Phao-lô cũng từng phải đối mặt với những kẻ tiên tri giả đầy xảo quyệt này, những kẻ tự mạo nhận là các sứ đồ siêu đẳng: “Vì những người như thế là sứ đồ giả mạo, thợ thầy lừa dối, giả làm sứ đồ của Đấng Ki-tô. Điều đó không lạ gì, vì chính Sa-tan cũng cứ giả làm thiên sứ sáng láng. Vậy, nếu thánh chức của hắn cũng cứ giả làm thánh chức của sự công chính thì chẳng có gì là đặc biệt. Nhưng sự kết thúc của chúng sẽ tùy theo việc làm của chúng” (2 Cô-rinh-tô 11:13-15).\n\nChúa Giê-su Ki-tô chỉ ra một cách đơn giản rằng tiêu chuẩn để nhận được sự cứu rỗi đời đời là làm theo ý muốn của Đức Chúa Trời: “Không phải bất cứ ai gọi tôi: ‘Chúa ơi, Chúa ơi’ đều sẽ được vào vương quốc trên trời đâu, nhưng chỉ ai làm theo ý muốn của Cha tôi ở trên trời mà thôi” (Ma-thi-ơ 7:21).\n\nLời kết của Bài Giảng trên Núi\n\n« 24 Vậy, ai nghe những lời này của tôi và làm theo thì giống như một người khôn khéo xây nhà mình trên vách đá. 25 Mưa sa, nước lụt, gió lay và ra sức đập vào nhà ấy, nhưng nó không sập vì đã được lập nền trên vách đá. 26 Còn ai nghe những lời này của tôi mà không làm theo thì giống như một người dại dột xây nhà mình trên cát. 27 Mưa sa, nước lụt, gió lay và tông vào nhà ấy, nó liền sụp đổ; và sự sụp đổ của nó thật là lớn lao » (Ma-thi-ơ 7:24-27).\n\nChúa Giê-su Ki-tô giảng dạy như một người có thẩm quyền\n\n« Khi Chúa Giê-su giảng các lời ấy xong, các đám đông đều kinh ngạc về cách giảng dạy của ngài; vì ngài dạy họ như một người có thẩm quyền, chứ không như các thầy thông giáo của họ » (Ma-thi-ơ 7:28,29).\n\nChúa Giê-su Ki-tô đã thực hiện Bài Giảng trên Núi tại Ga-li-lê, một vùng đất vừa làm nông nghiệp vừa có hoạt động đánh bắt cá. Vì thế, ngài đã đưa ra các minh họa gắn liền với đời sống thường nhật của họ, với rất nhiều chi tiết tham chiếu đến thiên nhiên. Chúa Giê-su Ki-tô đã lớn lên tại Ga-li-lê, và có lẽ người nghe cũng cảm nhận được điều đó; họ nhận ra rằng ngài là một người tuy mang sự khôn ngoan phi thường từ trời nhưng lại rất gần gũi với dân chúng và hết lòng yêu thương họ (Ma-thi-ơ 9:36). Tuy nhiên, điều cuốn hút người nghe nhất chính là sự thẳng thắn, lối nói bộc trực và thẩm quyền đầy lòng nhân từ của ngài đối với dân chúng.\n\nTrong Bài Giảng trên Núi, chúng ta nhận thấy rằng Chúa Giê-su Ki-tô đã hình ảnh hóa tất cả các ý tưởng quan trọng của mình. Điều này giúp cho người nghe ghi nhớ tốt hơn các ý cốt lõi trong bài diễn thuyết của ngài. Ví dụ, khi nhớ đến từ “hạnh phúc” ở đầu bài giảng, người nghe sẽ nghĩ đến niềm hy vọng bất chấp những khó khăn nghiêm trọng của mình. Minh họa về cọng rơm và khúc gỗ trong mắt dạy về việc không được xét đoán. Cánh cửa hẹp và con đường chật minh họa cho sự cần thiết phải bền chí cho đến khi niềm hy vọng Cơ Đốc được thành tựu.\n\nTrong Bài Giảng trên Núi không có bất kỳ ý tưởng nào khó hiểu, nhưng điều đó không hề làm giảm đi chiều sâu của các lời dạy dỗ. Chẳng hạn, trong các luật định về việc nghiêm cấm giết người và ngoại tình, Chúa Giê-su Ki-tô đã nhấn mạnh vào ý định hoặc động cơ có thể dẫn đến các tội lỗi nghiêm trọng này. Qua đó, ngài chỉ ra rằng để tránh rơi vào những kết cục cực đoan như vậy thì phải hành động ngay từ gốc rễ. Ví dụ, để tránh sự tức giận, thù hận, oán hận và sau này có thể là tội giết người, Chúa Giê-su Ki-tô đã cho thấy phải giải quyết các xung đột cá nhân càng sớm càng tốt nhằm tránh sự suy đồi chết chóc trong mối quan hệ giữa người với người.\n\nĐối với hệ quả hay kết quả cuối cùng của một tình huống, Chúa Giê-su Ki-tô cho thấy không chỉ tội lỗi đã thực hiện mới là nghiêm trọng, mà ngay cả ý định, dù chưa được cụ thể hóa, cũng là nghiêm trọng, như trong trường hợp ngoại tình. Đối với quy tắc vàng, qua cách diễn đạt cho thấy toàn bộ Luật Pháp và các Sách Tiên Tri đều tùy thuộc vào đó, ngài đã chỉ ra nền tảng của các luật lệ chính là những nguyên tắc vượt thời gian như lòng yêu kính Đức Chúa Trời và yêu thương người lân cận. Luật pháp có giá trị tùy theo hoàn cảnh (nó có thể bị bãi bỏ như Luật pháp Môi-se và được thay thế bằng một luật khác (Rô-ma 10:4)), trong khi nguyên tắc hay điều răn thì mang tính vượt thời gian hoặc vĩnh cửu, đó chính là điều mà quy tắc vàng đã chứng minh (Ma-thi-ơ 22:36-40).\n\nDo đó, bất kể thính giả của ngài là ai, chất lượng giảng dạy của ngài vẫn luôn đồng nhất. Tuy nhiên, khi ngài đối thoại với một nhóm người không có thói quen tư duy với các ý niệm trừu tượng, ngài sẽ sử dụng các minh họa để làm rõ ý nghĩa của chúng. Sức mạnh trong cách giảng dạy của ngài nằm ở khả năng giải thích những ý tưởng sâu sắc, vốn không phải lúc nào cũng dễ thấu hiểu, bằng một cách thức đơn giản, với những từ ngữ giản dị và các minh họa rõ ràng.\n\nNgược lại, khi ở trước mặt các bậc thầy nâng đỡ tôn giáo, ngài có thể làm cho họ kinh ngạc bởi chiều sâu kiến thức của mình về Kinh Thánh. Ví dụ, trong cuộc trò chuyện với Ni-cô-đét (chứ không phải Gamaliel)*, ngài đã nói về sự sinh lại. Ni-cô-đét đã hoàn toàn bị lúng túng bởi cụm từ này, vốn có mối liên hệ chặt chẽ với phép lạ báp-têm và cả sự sống lại của người chết. Trước sự ngạc nhiên đó, Chúa Giê-su Ki-tô đã đặt ra những câu hỏi tu từ: “Ông là thầy dạy dân Y-sơ-ra-ên mà lại không hiểu những điều ấy sao?”. Và ngài nói thêm: “Nếu tôi nói về những chuyện dưới đất mà anh em còn không tin, thì khi tôi nói về những chuyện trên trời, làm sao anh em tin được?”. Nói cách khác, Chúa Giê-su Ki-tô cho thấy ngài chưa đẩy độ khó của lời dạy lên quá cao khi chỉ giới hạn ở khía cạnh trần thế, đồng thời gợi mở rằng còn có cả một khía cạnh trên trời nữa (Giăng chương 3).\n\nĐôi khi ngài đặt ra một câu hỏi gợi mở rằng lời dạy dỗ còn có những khía cạnh thấu hiểu sâu xa khác. Ví dụ, những người cùng thời với Đấng Ki-tô gọi ngài là con vua Đa-vít, điều này vừa đúng đắn, nhưng trong một bối cảnh khác thì lại không phải như vậy: « Lúc những người Pha-ri-si đang tụ họp, Chúa Giê-su hỏi họ: “Anh em nghĩ sao về Đấng Ki-tô? Ngài là con ai?”. Họ đáp: “Con vua Đa-vít”. Ngài hỏi họ: “Thế thì tại sao Đa-vít được thần khí soi dẫn lại gọi ngài là ‘Chúa’, khi nói: ‘Đức Giê-hô-va phán với Chúa tôi: “Hãy ngồi bên hữu ta cho đến khi ta đặt kẻ thù con dưới chân con”’? Vậy nếu Đa-vít gọi ngài là ‘Chúa’ thì làm sao ngài là con Đa-vít được?”. Không ai đáp được một lời, và từ ngày đó, chẳng ai dám chất vấn ngài nữa » (Ma-thi-ơ 22:41-46).\n\nĐôi khi, lời dạy của ngài có thể trở nên rất phức tạp và khó hiểu, chẳng hạn như lời tiên tri về những ngày sau cùng trong Ma-thi-ơ chương 24, 25, Mác chương 13 và Lu-ca chương 21. Trong trường hợp cụ thể này, để thấu hiểu một số cách diễn đạt trong Kinh Thánh, người ta đã và đang cần phải có một kiến thức vững vàng về lời tiên tri của Đa-ni-ên, vì ngài chủ yếu tham chiếu từ sách đó.\n\nĐôi khi Chúa Giê-su Ki-tô tạo ra một sự chọn lọc trong vòng thính giả của mình, giữa những người chỉ lắng nghe ngài một cách hời hợt mà không tìm hiểu sâu thêm, và những người khác ít ỏi hơn nhiều, chẳng hạn như các sứ đồ, là những người đã chất vấn ngài để xin giải thích về ý nghĩa tượng trưng của các minh họa (Ma-thi-ơ 13:10-15).\n\nVẫn còn nhiều điều khác nữa để nói về phương pháp giảng dạy của Chúa Giê-su Ki-tô. Đây là điều rất đáng để noi theo, đặc biệt là đối với những người dạy dỗ Lời Đức Chúa Trời, nhằm làm cho sự dạy dỗ vừa có chiều sâu lại vừa đơn giản để thấu hiểu, từ đó giúp cho số lượng người tiếp cận được là nhiều nhất có thể: « Thật vậy, anh em được gọi vì mục đích đó, bởi chính Đấng Ki-tô đã chịu khổ vì anh em, để lại một gương để anh em theo sát dấu chân ngài » (1 Phi-e-rơ 2:21).\n\n#TâmLinh #NghiênCứuKinhThánh",
+                "url": "https://x.com/yomelijah/status/2120084036378931214",
+                "source": "@yomelijah",
+                "date": "Tue Nov 10 09:19:58 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "275"
+                }
+              },
+              {
+                "title": "https://t.co/pgHxhQEAxQ",
+                "summary": "https://t.co/pgHxhQEAxQ",
+                "url": "https://x.com/jasonleoyjbm/status/2120074546791473430",
+                "source": "@jasonleoyjbm",
+                "date": "Tue Nov 10 08:42:15 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "91"
+                }
+              },
+              {
+                "title": "Bản lĩnh Pioneers: Ngưng phán xét bằng tư duy hẹp hòi, hãy làm chủ vận hội kỷ nguyên số!",
+                "summary": "Bản lĩnh Pioneers: Ngưng phán xét bằng tư duy hẹp hòi, hãy làm chủ vận hội kỷ nguyên số!\n\nTrong dòng chảy khốc liệt của cuộc cách mạng công nghệ, có một quy luật bất biến: Thời thế tạo anh hùng, và xu thế vĩ đại của thời đại chưa bao giờ xoay quanh cái tôi của một cá nhân. Pi Network cũng vậy. Bạn không thể và không có quyền đòi hỏi Pi Network lúc này phải thế này hay phải thế kia theo ý muốn chủ quan của bạn! Hãy tỉnh thức để nhìn nhận một sự thật: Pi sinh ra là để xây dựng một hệ sinh thái cho toàn cộng đồng, kiến tạo một nền kinh tế số toàn cầu, chứ không phải được lập trình để chiều chuộng chủ kiến cá nhân của bất kỳ ai!\nĐây không phải là một dự án mỳ ăn liền, mà là một cuộc đại cách mạng vĩ mô mang tính lịch sử:\n• Đập tan tư duy đốt cháy giai đoạn: Pi Network là một tiến trình dịch chuyển khổng lồ, bứt phá từ nền tảng quá khứ, làm chủ hiện tại và định hình tương lai. Việc xây dựng một mạng lưới blockchain mạnh mẽ với hàng trăm ngàn node tích cực, thiết lập một đồng tiền chung có khả năng vận hành dòng chảy kinh tế vĩ mô đòi hỏi sự chuẩn bị kiên trì, vững chắc, chứ không phải là trò chơi của những kẻ ăn xổi ở thì!\n• Thành công là kết quả tất yếu, không phải sự cầu xin: Thành công tự khắc sẽ đến khi Pi Network đáp ứng trọn vẹn và giải quyết xuất sắc các bài toán thực tế của xu hướng kinh tế hiện tại. Khi giá trị nội tại được khẳng định, vị thế vĩ đại của Pi sẽ là điều hiển nhiên mà không cần bất kỳ sự thổi phồng hay thúc ép nhân tạo nào từ thị trường.\nThay vì tiêu tốn năng lượng vào những đòi hỏi phi lý, hay cố chấp ép buộc những cột mốc phát triển phải diễn ra khi chưa đúng thời điểm, vị thế của một Pioneer chân chính có tầm nhìn lớn là hiên ngang đồng hành và tận hưởng trọn vẹn hành trình lịch sử này! Hãy nhìn thẳng vào thực tế: Chính trong quá trình kiến tạo và thử thách này, những bài học sâu sắc nhất về tài chính số được đúc kết, và những cơ hội đổi đời vĩ đại nhất đang được mở ra.\nSự khác biệt duy nhất giữa một người kiến tạo tương lai và kẻ tụt hậu nằm ở tầm nhìn và nhận thức. Đã đến lúc phải rũ bỏ thứ tư duy cá nhân hẹp hòi, ích kỷ, luôn nhìn thế giới qua lăng kính phán xét và đòi hỏi lợi ích tức thì. Chủ động học hỏi, nâng cao tri thức và nhạy bén nắm bắt cơ hội mới chính là vũ khí tối thượng của người dẫn đầu!\nKỷ nguyên số và thế giới Web3 không có chỗ cho sự do dự hay những tiếng than vãn. Đó là sân chơi bản lĩnh của niềm tin sắt đá, sự kiên định và tri thức đại chúng. Hãy chuyển hóa sự sốt ruột tầm thường thành hành động học hỏi mạnh mẽ, biến tư duy đòi hỏi ích kỷ thành tinh thần cống hiến và đồng sáng tạo. Chúng ta không chỉ là những người chờ đợi vận hội, chúng ta chính là những chiến binh đang cùng Pi Network viết lại lịch sử tài chính của nhân loại! Hãy vững vàng bước tiếp và khẳng định vị thế của mình ngay hôm nay!\n\nBình Thiên Hạ \n#PiNetwork\n#Pioneers\n#tầmnhìn\nTuyên bố miễn trừ trách nhiệm: Các quan điểm được thể hiện trong bài viết này:\nNhững nội dung và thông tin được cung cấp trong bài viết chỉ nhằm mục đích giáo dục và giải trí,  không nên được hiểu là lời khuyên đầu tư hoặc bất kỳ lời khuyên nào khác.",
+                "url": "https://x.com/BinhthienhaH/status/2120056976537178528",
+                "source": "@BinhthienhaH",
+                "date": "Tue Nov 10 07:32:26 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "87"
+                }
+              },
+              {
+                "title": "☀️ Bản tin thứ Ba 10/11/2026",
+                "summary": "☀️ Bản tin thứ Ba 10/11/2026\n🇻🇳 Việt Nam\nChứng khoán hồi mạnh. Đầu giờ chiều, VN-Index tăng khoảng 1,2–1,3%, lên quanh 1.735 điểm. Cổ phiếu chứng khoán, bất động sản và ngân hàng như SSI, VIX, VHM, VIC dẫn dắt, nhờ Phố Wall tăng và giá dầu giảm. Hôm qua khối ngoại đã bán ròng 818 tỷ đồng. Báo Tin Tức\nNgân hàng Nhà nước (NHNN) sẽ mua ngoại tệ. Từ 11/11, NHNN mua USD giao ngay vào thứ Hai và thứ Tư hằng tuần với giá 25.500 đồng/USD. Hôm qua NHNN cũng bơm ròng khoảng 5.648 tỷ đồng qua thị trường mở. Việc mua USD cho thấy tỷ giá đã dịu và NHNN muốn tăng dự trữ ngoại hối. VIRA\nNgân sách 2027 đã được chốt. Bội chi là 739.597 tỷ đồng và tổng mức vay là 1.279.717 tỷ đồng. Năm tới Nhà nước sẽ tiếp tục chi mạnh cho đầu tư công, nên sẽ phát hành nhiều trái phiếu Chính phủ. Báo Đầu tư\nThủ tướng yêu cầu xử lý kiên quyết sở hữu chéo, \"sân sau\", sở hữu ngầm và thao túng ngân hàng. Tin này ảnh hưởng trực tiếp đến nhóm cổ phiếu ngân hàng. Báo Đầu tư\nViệt Nam và Nhật Bản ký 3 văn kiện với cam kết vốn hơn 43,1 tỷ yên. Thương mại hai nước đã vượt 49 tỷ USD, trong đó Việt Nam xuất siêu 3,42 tỷ USD. Báo Đầu tư\nVàng SJC biến động trong ngày. Sáng nay giá lên 141,5 triệu đồng/lượng, đầu giờ chiều lùi về khoảng 137,9–140,9 triệu đồng/lượng (mua vào – bán ra). Giá vàng thế giới đang quanh 4.120 USD/ounce. https://t.co/j154J36adG\n🌍 Thế giới\nMỹ và Iran hạ nhiệt. Ông Trump nói khả năng Mỹ tấn công Iran trở lại là \"khá thấp\". Brent giảm gần 6%, còn khoảng 92 USD/thùng, thấp nhất kể từ tháng 8. Iran thì vẫn bác tin đàm phán. Dầu rẻ giúp giảm áp lực lạm phát cho Việt Nam. Reuters qua Euronext\nChứng khoán toàn cầu bật tăng. S&P 500 tăng 2,35%, phiên mạnh nhất kể từ tháng 4. Hôm nay KOSPI tăng khoảng 4–5% và Nikkei khoảng 2,5–3% nhờ cổ phiếu chip và AI hồi phục. Bloomberg qua Swissinfo\nTối nay lúc 20h30 giờ Việt Nam, Mỹ công bố chỉ số giá tiêu dùng (CPI) tháng 10. Dự báo tăng 0,3% so với tháng trước. Thị trường đang đặt khoảng 84% khả năng Fed tăng lãi suất vào tháng 12, và lợi suất trái phiếu Mỹ 10 năm ở 4,88%. Số liệu này sẽ ảnh hưởng đến USD và dòng vốn vào các thị trường mới nổi. Reuters qua Euronext\nThặng dư thương mại của Trung Quốc vượt 1.000 tỷ USD. Xuất khẩu tháng 10 tăng 35,2%, nên căng thẳng thương mại dễ gia tăng trước cuộc gặp dự kiến giữa ông Trump, ông Tập và ông Putin tại APEC Thâm Quyến ngày 18–19/11. investingLive\nIsrael có thể đổi chính phủ. Ông Gadi Eisenkot được giao thành lập chính phủ thay ông Netanyahu và có 28 ngày để làm việc này. Kết quả sẽ ảnh hưởng đến cuộc chiến với Iran. Anadolu\nNga và Ukraine tiếp tục tấn công vào hạ tầng năng lượng của nhau. EU đã kích hoạt cơ chế khẩn cấp để giải ngân nhanh tiền sửa lưới điện cho Ukraine. Just Security\nTối nay cần theo dõi số liệu CPI của Mỹ. Hạn 29/11 Mỹ kết luận về thuế với hàng Việt Nam cũng đang đến gần.",
+                "url": "https://x.com/nguyenvuanh2121/status/2120053726828446120",
+                "source": "@nguyenvuanh2121",
+                "date": "Tue Nov 10 07:19:31 +0000 2026",
+                "metrics": {
+                  "favorites": 2,
+                  "retweets": 0,
+                  "views": "72"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R04_read_url_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_read_url",
+        "difficulty": "easy",
+        "what_it_tests": "Đã có link cụ thể → read_url, không phải web_search."
+      },
+      "input": "Tóm tắt bài này giúp mình: https://openai.com/blog/gpt-5",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://openai.com/blog/gpt-5"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://openai.com/blog/gpt-5"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "fetch",
+          "args": {
+            "url": "https://openai.com/blog/gpt-5"
+          },
+          "result": {
+            "tool": "read_url",
+            "url": "https://openai.com/blog/gpt-5",
+            "items": [
+              {
+                "title": "OpenAI",
+                "url": "https://openai.com/blog/gpt-5",
+                "source": "openai.com",
+                "summary": "OpenAI\n\n# 404\n\nSearch finds no result\n\nThe question still earns its keep\n\nAsk it a new way\n\nby [gpt-6-astra(opens in a new window)](https://chatgpt.com/?surface=work&model=gpt-6-astra-wm&openaicom-did=52cdc990-ae75-4748-bf07-215286d35858&openaicom_referred=true)"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R05_limit_arg",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "arg_limit",
+        "difficulty": "easy",
+        "what_it_tests": "Trích đúng limit=10 từ '10 tweet'."
+      },
+      "input": "Lấy 10 tweet mới nhất của Elon Musk",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 10
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 10
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "elonmusk",
+            "limit": 10
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "screenname": "elonmusk",
+            "items": [
+              {
+                "title": "RT @XFreeze: Elon Musk just revealed a massive update on Grok 4.8, and SpaceXSI has completely rebuilt its reinforcement",
+                "summary": "RT @XFreeze: Elon Musk just revealed a massive update on Grok 4.8, and SpaceXSI has completely rebuilt its reinforcement learning and infer…",
+                "url": "https://x.com/elonmusk/status/2120102894817173862",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:34:54 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 125,
+                  "views": "388496"
+                }
+              },
+              {
+                "title": "Turns out that the Starlink software, built for managing the movement of vast amounts of data through space and to the g",
+                "summary": "Turns out that the Starlink software, built for managing the movement of vast amounts of data through space and to the ground, is also very well suited to training super intelligence",
+                "url": "https://x.com/elonmusk/status/2120102767624880364",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:34:24 +0000 2026",
+                "metrics": {
+                  "favorites": 4454,
+                  "retweets": 480,
+                  "views": "483874"
+                }
+              },
+              {
+                "title": "RT @XFreeze: Elon Musk just revealed something huge about Grok's new SI training and inference infrastructure",
+                "summary": "RT @XFreeze: Elon Musk just revealed something huge about Grok's new SI training and inference infrastructure\n\nThe engineering behind Starl…",
+                "url": "https://x.com/elonmusk/status/2120101380144992635",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:28:53 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 85,
+                  "views": "362304"
+                }
+              },
+              {
+                "title": "RT @beffjezos: Taking the Shinkansen and all I can think about is how do we not have this between SF and LA...",
+                "summary": "RT @beffjezos: Taking the Shinkansen and all I can think about is how do we not have this between SF and LA...\n\n if only you knew how great…",
+                "url": "https://x.com/elonmusk/status/2120090806765932705",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 09:46:52 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 86,
+                  "views": "434652"
+                }
+              },
+              {
+                "title": "RT @TheCaptainEli: In February 2004 Elon Musk wrote the check that put Tesla Motors on the road: $6.5 million of a $7.5 ",
+                "summary": "RT @TheCaptainEli: In February 2004 Elon Musk wrote the check that put Tesla Motors on the road: $6.5 million of a $7.5 million Series A, p…",
+                "url": "https://x.com/elonmusk/status/2120082348398256182",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 09:13:15 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 165,
+                  "views": "455363"
+                }
+              },
+              {
+                "title": "RT @MegynKellyShow: .@MegynKelly on the absolute double standard in the Russell Brand sentencing: “If you needed any fur",
+                "summary": "RT @MegynKellyShow: .@MegynKelly on the absolute double standard in the Russell Brand sentencing: “If you needed any further proof that thi…",
+                "url": "https://x.com/elonmusk/status/2119996001490768028",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:30:09 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 1387,
+                  "views": "564128"
+                }
+              },
+              {
+                "title": "RT @firesidealpha: JUST IN: Memphis Mayor reveals SpaceX data center taxes more than doubled to $54 million, after $25 m",
+                "summary": "RT @firesidealpha: JUST IN: Memphis Mayor reveals SpaceX data center taxes more than doubled to $54 million, after $25 million last year ma…",
+                "url": "https://x.com/elonmusk/status/2119993726898774521",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:21:06 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 425,
+                  "views": "490877"
+                }
+              },
+              {
+                "title": "RT @ricwe123: The Germans are learning what mass immigration really means.",
+                "summary": "RT @ricwe123: The Germans are learning what mass immigration really means.\n\n\"Wir schaffen das\" https://t.co/pEQc1OMbao",
+                "url": "https://x.com/elonmusk/status/2119992481156829218",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:16:09 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 2307,
+                  "views": "470359"
+                }
+              },
+              {
+                "title": "RT @JTLonsdale: The UK “justice system” is an utter joke. Beyond parody. Total dishonor.",
+                "summary": "RT @JTLonsdale: The UK “justice system” is an utter joke. Beyond parody. Total dishonor.",
+                "url": "https://x.com/elonmusk/status/2119991850820051347",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:13:39 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 355,
+                  "views": "445339"
+                }
+              },
+              {
+                "title": "RT @TheJadeWarwick: UK judge gives Russel Brand 10 years 6 months for “rape”. ",
+                "summary": "RT @TheJadeWarwick: UK judge gives Russel Brand 10 years 6 months for “rape”. \nNo forensic evidence. No DNA. No CCTV. \n\nSame country and sy…",
+                "url": "https://x.com/elonmusk/status/2119991792842260619",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:13:25 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 821,
+                  "views": "413501"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R06_timeframe_arg",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "arg_timeframe",
+        "difficulty": "medium",
+        "what_it_tests": "'tuần này' → timeframe=week."
+      },
+      "input": "Tin công nghệ trong tuần này",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "week"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "Tin công nghệ trong tuần",
+              "search_type": "Latest"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "missing tool call lookup",
+          "extra tool call social_search"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "Tin công nghệ trong tuần",
+            "search_type": "Latest"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "Tin công nghệ trong tuần",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "VIR BIOTECHNOLOGY TĂNG HƠN 20% SAU KHI THUỐC ĐIỀU TRỊ VIÊM GAN DELTA ĐẠT KẾT QUẢ TÍCH CỰC",
+                "summary": "VIR BIOTECHNOLOGY TĂNG HƠN 20% SAU KHI THUỐC ĐIỀU TRỊ VIÊM GAN DELTA ĐẠT KẾT QUẢ TÍCH CỰC\n\nMột tin vui lớn vừa xuất hiện trong lĩnh vực công nghệ sinh học.\n\nVir Biotechnology (VIR) công bố thử nghiệm lâm sàng giai đoạn 3 ECLIPSE 1 đã đạt mục tiêu chính với liệu pháp kết hợp elebsiran và tobevibart, điều trị viêm gan D mạn tính.\n\n44% bệnh nhân đạt đồng thời hai tiêu chí: virus không còn phát hiện được và men gan ALT trở về bình thường sau 48 tuần.\nNhóm đối chứng ghi nhận tỷ lệ 0%.\nDữ liệu từ thử nghiệm giai đoạn 2 SOLSTICE cũng cho thấy hiệu quả duy trì tích cực.\n\nViêm gan D là bệnh lý nghiêm trọng, thường chỉ xuất hiện ở người đã nhiễm viêm gan B. Hiện nay, lựa chọn điều trị vẫn còn hạn chế.\n\nNếu được cơ quan quản lý phê duyệt, liệu pháp này có thể mở ra một thị trường điều trị mới cho Vir Biotechnology.\n\nCông ty dự kiến nộp hồ sơ xin phê duyệt vào giữa năm 2027. Thuốc cũng đã nhận các chương trình hỗ trợ như Breakthrough Therapy và Fast Track.\n\nPhản ứng thị trường: Cổ phiếu VIR tăng khoảng 11–22% trước giờ mở cửa.",
+                "url": "https://x.com/TobyNMT/status/2120097886914682959",
+                "source": "@TobyNMT",
+                "date": "Tue Nov 10 10:15:00 +0000 2026",
+                "metrics": {
+                  "favorites": 2,
+                  "retweets": 0,
+                  "views": "44"
+                }
+              },
+              {
+                "title": "QUỐC HỘI BƯỚC VÀO TUẦN CHẤT VẤN: AI PHẢI TRẢ LỜI NHỮNG VẤN ĐỀ NGƯỜI DÂN CHỜ ĐỢI?",
+                "summary": "QUỐC HỘI BƯỚC VÀO TUẦN CHẤT VẤN: AI PHẢI TRẢ LỜI NHỮNG VẤN ĐỀ NGƯỜI DÂN CHỜ ĐỢI?\n\nTừ ngày 9–13/11/2026, Quốc hội khóa XVI bước vào tuần làm việc thứ năm của Kỳ họp thứ hai. Đáng chú ý, ngày 12/11 sẽ diễn ra phiên chất vấn và trả lời chất vấn, với hai lĩnh vực trọng tâm là tài chính và khoa học – công nghệ. Hai người trả lời chính là Bộ trưởng Bộ Tài chính Ngô Văn Tuấn và Bộ trưởng Bộ Khoa học và Công nghệ Vũ Hải Quân; Thủ tướng hoặc Phó Thủ tướng được ủy quyền cũng sẽ trực tiếp trả lời chất vấn.\n\nĐây không chỉ là một phiên họp thường kỳ. Đó là dịp để những vấn đề tồn đọng lâu nay được đưa ra trước Quốc hội, nơi các bộ trưởng phải giải trình về chính sách, tiến độ và trách nhiệm quản lý. Nhưng điều người dân chờ đợi không đơn thuần là những câu trả lời tròn trịa, mà là lời giải cho những vấn đề đã được phản ánh nhiều lần nhưng vẫn chưa có chuyển biến rõ rệt.\n\nVới Bộ trưởng Bộ Tài chính, câu hỏi lớn nhất là: Vì sao tiền ngân sách đã bố trí nhưng nhiều công trình vẫn chậm tiến độ, trong khi người dân tiếp tục phải chờ những hạ tầng thiết yếu?\n\nHàng loạt dự án đầu tư công kéo dài, đội vốn, chậm giải ngân đã trở thành câu chuyện không mới. Ngay tại Nghệ An, dự án tái định cư Châu Khê được phê duyệt từ năm 2011 với tổng vốn hơn 63,5 tỷ đồng, nhưng sau 15 năm vẫn chưa hoàn thành. Nhiều hạng mục thiết yếu như đường giao thông, thoát nước, điện và công trình công cộng còn dang dở. Người dân vùng có nguy cơ sạt lở vẫn phải chờ nơi ở an toàn. Đây là ví dụ điển hình cho câu hỏi về hiệu quả sử dụng vốn đầu tư công: tiền đã được đưa vào dự án, nhưng mục tiêu phục vụ người dân vẫn chưa đạt được.\n\nVấn đề càng đáng chú ý khi theo báo cáo của Bộ Tài chính, đến hết tháng 10/2026, tổng vốn đầu tư công đã giải ngân đạt 708.567 tỷ đồng, tương đương 74,1% kế hoạch Thủ tướng giao. Như vậy, vẫn còn khoảng 247.300 tỷ đồng chưa được giải ngân.\n\nĐáng nói, Bộ Khoa học và Công nghệ nằm trong nhóm cơ quan có tỷ lệ giải ngân dưới 15%, thậm chí được chấm 38,47/100 điểm về kết quả giải ngân kế hoạch vốn năm 2026.\n\nVì sao ngân sách dành cho phát triển vẫn còn đó, trong khi nhiều địa phương, đơn vị và người dân đang cần những công trình thiết yếu? Ai chịu trách nhiệm khi vốn được phân bổ nhưng dự án không thể triển khai đúng tiến độ?\nVới Bộ trưởng Bộ Khoa học và Công nghệ, vấn đề không chỉ là chuyển đổi số hay phát triển trí tuệ nhân tạo, mà còn là hiệu quả thực chất của những khoản đầu tư cho khoa học.\n\nTheo thông tin được công bố, nguồn thu từ hoạt động khoa học, công nghệ mới chiếm khoảng 4,94% tổng nguồn thu của các trường đại học. Trong danh mục hơn 1.000 sản phẩm công nghệ của 41 đơn vị, mới có 334 sản phẩm đạt mức sẵn sàng chuyển giao từ cấp độ 7-9; còn 484 sản phẩm chưa xác định được mức độ sẵn sàng. Điều đó đặt ra câu hỏi về khoảng cách giữa nghiên cứu trong phòng thí nghiệm và sản phẩm thực sự phục vụ đời sống, sản xuất.\n\nChưa kể, chuyển đổi số vẫn là nỗi vất vả của không ít người dân: dữ liệu chưa liên thông, phần mềm phân tán, thủ tục trực tuyến nhưng vẫn phải bổ sung giấy tờ, đi lại nhiều lần. AI được kỳ vọng tạo đột phá, nhưng vấn đề bảo vệ dữ liệu cá nhân, an toàn thông tin và trách nhiệm khi công nghệ gây ra sai sót cũng không thể xem nhẹ.\n\nMột phiên chất vấn chỉ diễn ra trong một ngày, nhưng những vấn đề được đưa ra đã tồn tại qua nhiều năm. Vì vậy, điều cử tri cần theo dõi không chỉ là bộ trưởng trả lời thế nào, mà còn là sau chất vấn, bao nhiêu dự án được tháo gỡ, bao nhiêu đồng vốn được sử dụng hiệu quả, bao nhiêu thủ tục được đơn giản hóa và bao nhiêu cam kết được thực hiện.\n\nTheo mọi người, sau mỗi phiên chất vấn, Quốc hội cần có cơ chế nào để theo dõi đến cùng việc thực hiện cam kết của bộ trưởng, thay vì để những vấn đề người dân phản ánh hôm nay tiếp tục trở thành nội dung chất vấn ở những kỳ họp năm sau?\n\nSan San\n\n#chatvan #traloidan #quochoi #chantroimoi",
+                "url": "https://x.com/chantmmedia/status/2120094122664984942",
+                "source": "@chantmmedia",
+                "date": "Tue Nov 10 10:00:02 +0000 2026",
+                "metrics": {
+                  "favorites": 1,
+                  "retweets": 0,
+                  "views": "32"
+                }
+              },
+              {
+                "title": "MƯA GIÓ CHÁN QUÁ NÊN LÊN ĐÂY CHIA SẺ CHÚT VỀ CÁCH MÌNH SỐNG.",
+                "summary": "MƯA GIÓ CHÁN QUÁ NÊN LÊN ĐÂY CHIA SẺ CHÚT VỀ CÁCH MÌNH SỐNG.\nMình 31 tuổi, ở tỉnh nhỏ, thu nhập 15-18 triệu mỗi tháng, làm 6-8 tiếng một ngày, 6 ngày một tuần, vẫn ở nhà bố mẹ.\nHọc xong cao học, được đào tạo về hai ngành khác nhau và đã làm nhiều năm ở cả hai mảng.\nPhải nói thật là với nền tảng đó mình mới có dư địa để điều chỉnh lối sống theo ý mình.\nChứ nếu không có chỗ ở, không có xe thì chưa chắc mình đã làm được như bây giờ.\nMình gọi đây là kiểu nằm thẳng nhưng không hẳn nằm thẳng, vì vẫn làm việc, vẫn có nguyên tắc, chỉ là không chạy theo những thứ mình thấy vô nghĩa.\nCông việc thì mình chọn loại tạo ra giá trị thật và trả công xứng đáng, trong khả năng của mình thì thêm được phần giá trị gia tăng nào hay phần đó.\nMình không vay nợ, không dùng tín dụng để mua nhà, mua xe hay xa xỉ phẩm, cũng không cho ai vay tiền.\nBảo hiểm thì chỉ mua y tế, không tham gia bảo hiểm xã hội hay nhân thọ.\nMỗi tháng mình mua vàng nhẫn và trích thu nhập bỏ vào vài sổ tiết kiệm, tháng dư nhiều bỏ nhiều, tháng dư ít bỏ ít, thuế thì đóng đầy đủ.\nĐồ thiết yếu như điện thoại, máy tính, quần áo, giày dép, mỹ phẩm thì mình đặt giá trần, không bao giờ mua nguyên giá, cũng không mua chỉ vì thấy rẻ mà không phục vụ được gì cho mình.\nMình xây một tủ quần áo cá nhân đủ cho các tình huống cơ bản, vui thì tự thưởng một chai dầu thơm.\nQuan hệ xã hội thì tối giản tối đa, không nhậu nhẹt trừ khi là bạn rất thân, rất lâu mới gặp.\nĂn uống có chế độ rõ ràng, kiểm soát calo, mỗi tuần thưởng một bữa ngon ở ngoài.\nƯu tiên đồ chưa qua chế biến công nghiệp, ít gia vị, ít dầu mỡ, vận động vừa phải để tăng NEAT, uống nhiều nước và ưu tiên giấc ngủ sâu.\nHobby thì mình chọn mấy thứ khó bị ảnh hưởng bởi chủ nghĩa tiêu thụ như phim, nhạc, sách, triết học Spinoza, Adam Smith, và viết tay.\nCòn một điều nữa là mình không để mấy đại tự sự như tổ quốc, quê hương, yêu nước, tình bạn cao cả hay tình yêu của đời mình chi phối cách sống nữa.\nThay vào đó mình theo đuổi các mối quan hệ vị lợi trên cơ sở không chà đạp nhau, cả hai bên đều mang lại giá trị cho nhau và không vượt ranh giới của nhau, nếu không thì mình loại bỏ.\nAi đọc đến đây thì cảm ơn nhiều, mình rất muốn nghe quan điểm sống của mọi người.",
+                "url": "https://x.com/haidaulau/status/2120092089547636964",
+                "source": "@haidaulau",
+                "date": "Tue Nov 10 09:51:58 +0000 2026",
+                "metrics": {
+                  "favorites": 2,
+                  "retweets": 1,
+                  "views": "32"
+                }
+              },
+              {
+                "title": "🇨🇳 五国：同学聚会回来以后，偷偷重新考虑的人生选择 TOP10",
+                "summary": "🇨🇳 五国：同学聚会回来以后，偷偷重新考虑的人生选择 TOP10\n🇯🇵 5か国：同窓会から帰った後、ひそかに考え直した人生の選択 TOP10\n🇰🇷 5개국: 동창 모임에서 돌아온 뒤 혼자 다시 생각해 본 인생의 선택 TOP10\n🇻🇳 5 quốc gia: Những lựa chọn cuộc đời âm thầm nghĩ lại sau buổi họp lớp TOP10\n🇺🇸 Five Countries: Life Choices You Quietly Reconsider After a Class Reunion TOP10\n🇨🇳 中国\n按居住、工作、关系和个人时间，选出十个虚构自省场景。不是调查排名，也不把聚会上的近况片段当作任何人的完整人生。\n1）究竟想在哪座城市生活 | どの街で暮らしたいか | 어느 도시에서 살고 싶은지 | Thực sự muốn sống ở thành phố nào | Which city you want to live in\n有人换了城市，有人一直没走。回去路上，你重新问自己：现在留下，是因为喜欢这里，还是一直没认真想过别处？\n2）还想不想继续这个行业 | 今の業界で働き続けたいか | 이 업계에서 계속 일하고 싶은지 | Có muốn tiếp tục ngành hiện tại không | Whether to stay in your industry\n同学讲起一次转行，没有讲成逆袭故事。你却记住了他怎么做出决定，回家翻出了自己搁置很久的念头。\n3）能接受怎样的工作节奏 | どんな働くペースなら続けられるか | 어떤 업무 속도로 살아갈 수 있는지 | Chấp nhận nhịp làm việc thế nào | What pace of work you can live with\n饭桌上有人一直回消息，也有人提前离开。你没有判断谁更成功，只开始想，自己希望一个普通晚上是什么样子。\n\n4）还想重新学什么 | 今から何を学びたいか | 지금 다시 무엇을 배우고 싶은지 | Còn muốn học lại điều gì | What you still want to learn\n以前不爱发言的同学，讲起最近学的东西很投入。你回家后搜了搜那个一直想学、却总说以后再说的领域。\n5）住得大还是离生活近 | 広さと暮らしやすい距離のどちらを求めるか | 넓이와 생활의 거리 중 무엇을 원하는지 | Muốn nhà rộng hay gần cuộc sống thường ngày | More space or being closer to daily life\n聊到住处，你原本只会比较大小。听完不同的日常，才发现自己还在意通勤、朋友，以及下楼后有没有想去的地方。\n\n6）怎样把时间留给家人 | 家族との時間をどうつくるか | 가족과 시간을 어떻게 나눌지 | Dành thời gian cho gia đình thế nào | How to make time for family\n有人随口讲起最近和家人一起做的小事。你没有立刻许下大计划，只发现自己又把一次想打的电话拖了很久。\n7）哪些友谊值得主动联系 | どの友人に自分から連絡したいか | 어떤 친구에게 먼저 연락하고 싶은지 | Muốn chủ động giữ liên lạc với ai | Which friendships you want to maintain\n聚会时聊得最舒服的，未必是以前最常坐在一起的人。回来后，你第一次不等群里热闹，单独给对方发了条消息。\n8）要不要给爱好留固定时间 | 趣味の時間を予定に入れるか | 취미 시간을 일정에 넣을지 | Có dành thời gian cố định cho sở thích không | Whether to make regular time for a hobby\n你原本以为别人也只是偶尔玩玩。听见对方每周都留一点时间，才发现自己并不是没兴趣，而是从没把它排进日程。\n9）生活要展示到什么程度 | 暮らしをどこまで人に見せたいか | 내 생활을 어디까지 보여 주고 싶은지 | Muốn chia sẻ cuộc sống đến mức nào | How much of your life you want to show\n有人近况发得多，有人几乎不更新，坐下来却各有很多故事。你重新想了想，哪些事情想分享，哪些只想自己好好过。\n10）还要不要用同一把尺子 | 同じ物差しで比べ続けたいか | 같은 기준으로 계속 비교할지 | Có tiếp tục so bằng cùng một thước đo không | Whether to keep using the same measure\n散场时，你发现大家已经走进不同的生活。以前拿来比较的几项数字，忽然装不下这一桌人，也装不下现在的自己。\n聚会结束后，你最容易重新考虑哪件事？有没有一个念头，不是想超过谁，而是想让自己的日子更合意一点？\n\n🇯🇵 日本\n住む場所、仕事、人との関係、自分の時間から選んだ十の架空の内省場面です。調査による順位ではなく、同窓会で聞いた近況だけで誰かの人生全体を判断するものでもありません。\n\n1）どの街で暮らしたいか | 究竟想在哪座城市生活 | 어느 도시에서 살고 싶은지 | Thực sự muốn sống ở thành phố nào | Which city you want to live in\n街を移った人も、ずっと残っている人もいた。帰り道、今いる場所が好きなのか、ほかを考えたことがないのかと自分に聞く。\n2）今の業界で働き続けたいか | 还想不想继续这个行业 | 이 업계에서 계속 일하고 싶은지 | Có muốn tiếp tục ngành hiện tại không | Whether to stay in your industry\n友人は転職を華やかな成功談としては話さなかった。それでも決めるまでの過程が残り、自分が先送りしていた考えを思い出す。\n3）どんな働くペースなら続けられるか | 能接受怎样的工作节奏 | 어떤 업무 속도로 살아갈 수 있는지 | Chấp nhận nhịp làm việc thế nào | What pace of work you can live with\n何度も仕事の連絡に返す人も、早めに帰る人もいる。優劣より、自分は普通の夜をどう過ごしたいのか考え始める。\n4）今から何を学びたいか | 还想重新学什么 | 지금 다시 무엇을 배우고 싶은지 | Còn muốn học lại điều gì | What you still want to learn\n昔は静かだった同級生が、最近の学びを楽しそうに話す。帰宅後、いつか学びたいと思っていた分野を検索する。\n5）広さと暮らしやすい距離のどちらを求めるか | 住得大还是离生活近 | 넓이와 생활의 거리 중 무엇을 원하는지 | Muốn nhà rộng hay gần cuộc sống thường ngày | More space or being closer to daily life\n住まいを広さだけで比べていた。話を聞いて、通勤や友人との距離、近所に行きたい場所があることも気になってくる。\n6）家族との時間をどうつくるか | 怎样把时间留给家人 | 가족과 시간을 어떻게 나눌지 | Dành thời gian cho gia đình thế nào | How to make time for family\n友人が家族との小さな出来事を話した。大きな計画より先に、自分がずっと後回しにしている電話を思い出す。\n\n7）どの友人に自分から連絡したいか | 哪些友谊值得主动联系 | 어떤 친구에게 먼저 연락하고 싶은지 | Muốn chủ động giữ liên lạc với ai | Which friendships you want to maintain\n一番話しやすかった相手は、昔いつも隣にいた人とは限らなかった。帰ってから、グループの動きを待たず個別に連絡する。\n8）趣味の時間を予定に入れるか | 要不要给爱好留固定时间 | 취미 시간을 일정에 넣을지 | Có dành thời gian cố định cho sở thích không | Whether to make regular time for a hobby\n相手も気が向いたときだけ楽しんでいると思っていた。毎週時間を取ると聞いて、自分はまだ予定に入れたことがなかったと気づく。\n9）暮らしをどこまで人に見せたいか | 生活要展示到什么程度 | 내 생활을 어디까지 보여 주고 싶은지 | Muốn chia sẻ cuộc sống đến mức nào | How much of your life you want to show\nよく投稿する人にも、ほとんど更新しない人にも話があった。何を共有し、何を自分だけで大事にしたいか考え直す。\n10）同じ物差しで比べ続けたいか | 还要不要用同一把尺子 | 같은 기준으로 계속 비교할지 | Có tiếp tục so bằng cùng một thước đo không | Whether to keep using the same measure\n帰る頃には、それぞれの暮らしが違う方向へ進んでいると感じる。昔の比較項目だけでは、皆の今も自分の今も収まらない。\n同窓会の後、何を考え直しがちですか？誰かを追い越すためではなく、自分に合う暮らしに近づけたいと思ったことはありますか？\n\n🇰🇷 대한민국\n사는 곳, 일, 관계, 개인 시간을 기준으로 만든 열 가지 가상 성찰 장면입니다. 설문 순위가 아니며 모임에서 들은 근황만으로 누군가의 삶 전체를 판단하지 않습니다.\n1）어느 도시에서 살고 싶은지 | 究竟想在哪座城市生活 | どの街で暮らしたいか | Thực sự muốn sống ở thành phố nào | Which city you want to live in\n도시를 옮긴 사람도 계속 남은 사람도 있었다. 돌아오는 길에 지금 이곳이 좋은 건지, 다른 곳을 진지하게 생각한 적이 없는 건지 묻는다.\n\n2）이 업계에서 계속 일하고 싶은지 | 还想不想继续这个行业 | 今の業界で働き続けたいか | Có muốn tiếp tục ngành hiện tại không | Whether to stay in your industry\n친구는 업종을 바꾼 일을 화려한 성공담으로 말하지 않았다. 그래도 결정한 과정이 기억에 남아 미뤄 둔 내 생각을 다시 꺼낸다.\n3）어떤 업무 속도로 살아갈 수 있는지 | 能接受怎样的工作节奏 | どんな働くペースなら続けられるか | Chấp nhận nhịp làm việc thế nào | What pace of work you can live with\n계속 업무 메시지에 답하는 사람도 먼저 가는 사람도 있었다. 누가 더 성공했는지보다 내 평범한 저녁이 어떻기를 바라는지 생각한다.\n4）지금 다시 무엇을 배우고 싶은지 | 还想重新学什么 | 今から何を学びたいか | Còn muốn học lại điều gì | What you still want to learn\n예전에는 조용했던 친구가 요즘 배우는 것을 신나게 이야기한다. 집에 와서 언젠가 하겠다며 미뤘던 분야를 검색한다.\n5）넓이와 생활의 거리 중 무엇을 원하는지 | 住得大还是离生活近 | 広さと暮らしやすい距離のどちらを求めるか | Muốn nhà rộng hay gần cuộc sống thường ngày | More space or being closer to daily life\n집 이야기를 하면 크기부터 비교했다. 다른 일상을 듣고 나니 출퇴근과 친구까지의 거리, 근처에 가고 싶은 곳이 있는지도 중요해진다.\n6）가족과 시간을 어떻게 나눌지 | 怎样把时间留给家人 | 家族との時間をどうつくるか | Dành thời gian cho gia đình thế nào | How to make time for family\n친구가 가족과 함께한 작은 일을 이야기한다. 거창한 계획보다 먼저 오래 미뤄 둔 전화 한 통이 떠오른다.\n7）어떤 친구에게 먼저 연락하고 싶은지 | 哪些友谊值得主动联系 | どの友人に自分から連絡したいか | Muốn chủ động giữ liên lạc với ai | Which friendships you want to maintain\n가장 편하게 대화한 사람이 예전에 늘 붙어 다니던 친구는 아니었다. 돌아와서 단체방이 움직이길 기다리지 않고 따로 메시지를 보낸다.\n\n8）취미 시간을 일정에 넣을지 | 要不要给爱好留固定时间 | 趣味の時間を予定に入れるか | Có dành thời gian cố định cho sở thích không | Whether to make regular time for a hobby\n다른 사람도 가끔 즐기는 줄 알았다. 매주 시간을 남겨 둔다는 말을 듣고 나는 한 번도 일정에 넣지 않았다는 걸 안다.\n9）내 생활을 어디까지 보여 주고 싶은지 | 生活要展示到什么程度 | 暮らしをどこまで人に見せたいか | Muốn chia sẻ cuộc sống đến mức nào | How much of your life you want to show\n자주 올리는 사람도 거의 올리지 않는 사람도 할 이야기가 많았다. 무엇을 나누고 무엇을 혼자 간직할지 다시 생각한다.\n10）같은 기준으로 계속 비교할지 | 还要不要用同一把尺子 | 同じ物差しで比べ続けたいか | Có tiếp tục so bằng cùng một thước đo không | Whether to keep using the same measure\n헤어질 때쯤 모두 다른 삶으로 향하고 있음을 느낀다. 예전에 비교하던 몇 가지 숫자로는 이 사람들도 지금의 나도 다 설명되지 않는다.\n동창 모임 뒤 어떤 선택을 가장 많이 다시 생각하나요? 누군가를 앞서기보다 내게 맞는 일상을 만들고 싶어진 적이 있나요?\n\n🇻🇳 Việt Nam\nMười tình huống tự suy ngẫm hư cấu được chọn từ nơi ở, công việc, quan hệ và thời gian riêng. Đây không phải khảo sát, cũng không xem vài mẩu chuyện trong buổi gặp là toàn bộ cuộc đời ai.\n1）Thực sự muốn sống ở thành phố nào | 究竟想在哪座城市生活 | どの街で暮らしたいか | 어느 도시에서 살고 싶은지 | Which city you want to live in\nCó người đã chuyển đi, có người vẫn ở lại. Trên đường về tự hỏi mình ở đây vì thích hay vì chưa từng nghĩ kỹ về nơi khác.\n2）Có muốn tiếp tục ngành hiện tại không | 还想不想继续这个行业 | 今の業界で働き続けたいか | 이 업계에서 계속 일하고 싶은지 | Whether to stay in your industry\nBạn không kể chuyện đổi nghề như một màn thành công rực rỡ. Nhưng cách bạn đi đến quyết định lại khiến mình nhớ ý định đã gác lâu.\n\n3）Chấp nhận nhịp làm việc thế nào | 能接受怎样的工作节奏 | どんな働くペースなら続けられるか | 어떤 업무 속도로 살아갈 수 있는지 | What pace of work you can live with\nCó người liên tục trả lời tin công việc, có người về sớm. Không chấm ai thành công hơn, chỉ bắt đầu nghĩ mình muốn một tối bình thường ra sao.\n4）Còn muốn học lại điều gì | 还想重新学什么 | 今から何を学びたいか | 지금 다시 무엇을 배우고 싶은지 | What you still want to learn\nNgười bạn từng ít nói giờ hào hứng kể thứ đang học. Về nhà lại tìm lĩnh vực mình cứ nói để sau rồi chưa bắt đầu.\n5）Muốn nhà rộng hay gần cuộc sống thường ngày | 住得大还是离生活近 | 広さと暮らしやすい距離のどちらを求めるか | 넓이와 생활의 거리 중 무엇을 원하는지 | More space or being closer to daily life\nTrước nói về nhà chỉ so rộng bao nhiêu. Nghe những nếp sống khác mới nhớ mình còn quan tâm đường đi làm, bạn bè và chỗ muốn ghé gần nhà.\n6）Dành thời gian cho gia đình thế nào | 怎样把时间留给家人 | 家族との時間をどうつくるか | 가족과 시간을 어떻게 나눌지 | How to make time for family\nCó người kể chuyện nhỏ mới làm cùng gia đình. Chưa vội hứa kế hoạch lớn, chỉ nhận ra một cuộc gọi mình muốn gọi đã bị hoãn rất lâu.\n7）Muốn chủ động giữ liên lạc với ai | 哪些友谊值得主动联系 | どの友人に自分から連絡したいか | 어떤 친구에게 먼저 연락하고 싶은지 | Which friendships you want to maintain\nNgười nói chuyện hợp nhất chưa chắc là người ngày xưa hay ngồi cạnh. Về rồi chủ động nhắn riêng thay vì chờ nhóm đông vui.\n8）Có dành thời gian cố định cho sở thích không | 要不要给爱好留固定时间 | 趣味の時間を予定に入れるか | 취미 시간을 일정에 넣을지 | Whether to make regular time for a hobby\nTưởng người kia cũng chỉ thỉnh thoảng chơi. Nghe bạn dành thời gian mỗi tuần mới thấy mình chưa từng thực sự xếp sở thích vào lịch.\n\n9）Muốn chia sẻ cuộc sống đến mức nào | 生活要展示到什么程度 | 暮らしをどこまで人に見せたいか | 내 생활을 어디까지 보여 주고 싶은지 | How much of your life you want to show\nNgười đăng nhiều hay gần như không cập nhật đều có chuyện để kể. Mình nghĩ lại điều muốn chia sẻ và điều chỉ muốn tự sống cho trọn.\n10）Có tiếp tục so bằng cùng một thước đo không | 还要不要用同一把尺子 | 同じ物差しで比べ続けたいか | 같은 기준으로 계속 비교할지 | Whether to keep using the same measure\nTan buổi mới thấy mọi người đã đi vào những cuộc sống khác nhau. Vài con số từng dùng để so không còn chứa hết cả bàn, cũng chẳng chứa hết mình.\nSau họp lớp, bạn hay nghĩ lại lựa chọn nào nhất? Có ý định nào không phải để vượt ai mà để cuộc sống hợp với mình hơn không?\n\n🇺🇸 United States\nTen fictional reflections chosen around where you live, work, relationships, and personal time. This is an editorial list, not a survey, and a reunion update is only a fragment of someone’s life.\n1）Which city you want to live in | 究竟想在哪座城市生活 | どの街で暮らしたいか | 어느 도시에서 살고 싶은지 | Thực sự muốn sống ở thành phố nào\nSome classmates moved; others stayed. On the way back, you ask whether you like where you live or simply haven’t seriously considered anywhere else.\n2）Whether to stay in your industry | 还想不想继续这个行业 | 今の業界で働き続けたいか | 이 업계에서 계속 일하고 싶은지 | Có muốn tiếp tục ngành hiện tại không\nA classmate doesn’t present their career change as a triumphant story. Still, the way they reached the decision brings back a thought you had put aside.\n3）What pace of work you can live with | 能接受怎样的工作节奏 | どんな働くペースなら続けられるか | 어떤 업무 속도로 살아갈 수 있는지 | Chấp nhận nhịp làm việc thế nào\nSomeone keeps answering work messages; someone else leaves early. You find yourself thinking about what you want an ordinary evening to look like.\n\n4）What you still want to learn | 还想重新学什么 | 今から何を学びたいか | 지금 다시 무엇을 배우고 싶은지 | Còn muốn học lại điều gì\nA formerly quiet classmate speaks enthusiastically about something they are learning. Back home, you search for the subject you keep saving for “someday.”\n5）More space or being closer to daily life | 住得大还是离生活近 | 広さと暮らしやすい距離のどちらを求めるか | 넓이와 생활의 거리 중 무엇을 원하는지 | Muốn nhà rộng hay gần cuộc sống thường ngày\nYou used to compare homes mainly by size. Hearing different routines reminds you of commutes, friends, and having somewhere nearby you actually want to go.\n6）How to make time for family | 怎样把时间留给家人 | 家族との時間をどうつくるか | 가족과 시간을 어떻게 나눌지 | Dành thời gian cho gia đình thế nào\nSomeone mentions a small thing they recently did with family. Before making a grand plan, you remember the call you have been putting off.\n7）Which friendships you want to maintain | 哪些友谊值得主动联系 | どの友人に自分から連絡したいか | 어떤 친구에게 먼저 연락하고 싶은지 | Muốn chủ động giữ liên lạc với ai\nThe easiest conversation isn’t necessarily with the person you once sat beside most often. Afterward, you send a direct message rather than wait for the group chat.\n8）Whether to make regular time for a hobby | 要不要给爱好留固定时间 | 趣味の時間を予定に入れるか | 취미 시간을 일정에 넣을지 | Có dành thời gian cố định cho sở thích không\nYou assumed they only did it occasionally. Hearing that they reserve time every week makes you notice you have never put your own interest on the calendar.\n9）How much of your life you want to show | 生活要展示到什么程度 | 暮らしをどこまで人に見せたいか | 내 생활을 어디까지 보여 주고 싶은지 | Muốn chia sẻ cuộc sống đến mức nào\nFrequent posters and nearly silent accounts both have stories to tell. You reconsider what you want to share and what you prefer to experience privately.\n\n10）Whether to keep using the same measure | 还要不要用同一把尺子 | 同じ物差しで比べ続けたいか | 같은 기준으로 계속 비교할지 | Có tiếp tục so bằng cùng một thước đo không\nBy the end, everyone’s life seems to have taken a different shape. The few numbers you once compared no longer describe the table, or you.\nWhich choice do you tend to reconsider after a reunion? Has it ever made you want a life that fits you better, rather than one that gets ahead of someone else?",
+                "url": "https://x.com/FrankIndie/status/2120050063238103093",
+                "source": "@FrankIndie",
+                "date": "Tue Nov 10 07:04:58 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "226"
+                }
+              },
+              {
+                "title": "MỘT LINH HỒN KIÊU HÃNH ",
+                "summary": "MỘT LINH HỒN KIÊU HÃNH \n(CHƯƠNG 1, PHẦN 3)\nViệc đó không khác gì là Sapa đang bị cầm tù trên chính lãnh thổ mà cha của mình để lại.\n\nNgày hôm qua, chú của Sapa cùng các sư tử đực trưởng thành trong bầy đã cùng nhau đi nói chuyện với những kẻ xâm phạm kia, hi vọng rằng sẽ đạt được hiệp định hòa bình cho tới khi mùa khô này kết thúc. Bởi khi đã trải qua đủ ba mùa khô thì Sapa cùng các sư tử con cùng lứa sẽ được xem là đã trưởng thành. Như vậy thì chiến lược của bầy coi như đã khôi phục được một phần. Lúc đó thì mọi thứ sẽ dễ dàng hơn, không cần phải quá cẩn thận và nhẫn nhịn như lúc này.\n\nVới loài ăn thịt, khi chúng đủ mạnh thì khó khăn sẽ đến từ việc tranh đoạt sự sống với tự nhiên, thứ luôn là một cuộc chiến không bao giờ kết thúc. Còn nếu không đủ mạnh thì thứ nguy hiểm đầu tiên và luôn chực chờ chính là sự cạnh tranh của giống loài, là loại cuộc chiến mà một khi đã bắt đầu thì luôn kết thúc bằng cái chết dành cho kẻ yếu. Thảo nguyên rất rộng, nó đủ rộng để chứa đựng hàng triệu giống loài, nhưng nó không đủ rộng để chứa chấp những kẻ yếu ớt không đủ sức tự bảo vệ cho mình. \n\nCác mẹ trong bầy nói rằng Sapa rất giống cha của mình, cả màu lông, cả bờm, cả cách di chuyển và đặc biệt giống nhất là đôi mắt. Chính là đôi mắt mà khi nhìn vào thì những người khác sẽ tự nhiên thấy an tâm cùng tin tưởng. Bản thân Sapa cũng tin vào điều đó, tin rằng khi trưởng thành thì mình sẽ dũng mãnh và vững chắc để làm chỗ dựa cho mọi người giống như cha. \n\nSapa tính rằng đợi hết mùa khô này thì nó sẽ khiêu chiến với chú ruột để lấy lại vị chí mà vốn thuộc về nó. Rồi sẽ tiếp tục tâm nguyện của cha, rằng sẽ đưa cả bầy trở thành bầy sư tử hùng mạnh nhất trên cả thảo nguyên này.\n\nĐể chỉ cần chờ đợi thôi, chờ cho những cơn gió thuận mùa đưa những đám mây ẩm ướt sẫm màu quay trở lại thì mọi thứ sẽ tốt hơn, Sapa tin vào điều đó, như cách nó tin vào bản thân và tin vào cha của mình. Giống như lời mà cha dạy, rằng lòng tin của kẻ mạnh là thứ mà đầu tiên phải đặt vào chính bản thân mình.\n\nSáng hôm sau, khi Sapa thức giấc và trở về bầy thì người mẹ lớn đã chờ sẵn ở đó. Bà nhìn Sapa với đôi mắt đau buồn, còn phía sau lưng của bà thì những người mẹ khác vẫn còn đang than khóc, họ khóc còn nhiều hơn lúc mà cha của Sapa chết, việc này khiến Sapa cảm thấy sợ hãi.\n\nRồi mẹ lớn nói cho Sapa nghe từng tin tức một, đều là những tin tức mà nội dung không khác gì tiếng chuông báo tử dành riêng cho Sapa.\n\nTin đầu tiên, buổi thương thuyết đã thất bại, chú của Sapa đã bị giết chết ngay khi đôi bên vừa gặp mặt. Là một cuộc chiến sinh tử công bằng giữa hai sư tử đầu đàn với nhau, vậy nên không có gì để oán hận về cái chết của chú.\n\nTin thứ hai, ba sư sử đực trưởng thành đi cùng chú đã chấp nhận quy phục bầy mới, đó là lựa chọn bắt buộc, đúng đắn và khôn ngoan. Vậy nên không có gì để trách cứ họ cả, vì bất cứ ai rơi vào trường hợp đó thì cũng sẽ đều đưa ra lựa chọn tương tự.\n\nTin thứ ba chính là sự sáp nhập của hai đàn, để lát nữa đây mẹ lớn sẽ dẫn tất cả sang lãnh địa bên kia, hòa vào rồi trở thành một phần của đàn mới, sẽ tuyên thệ trung thành với sư tử đứng đầu đàn bên kia giống với cách mà họ từng trung thành với cha của Sapa. Đó là luật của thảo nguyên, luật của kẻ mạnh, họ buộc phải tuân theo nếu còn muốn tiếp tục sống trên mảnh đất này, không chỉ vì họ, mà còn vì những đứa con của họ.\n\nCòn tin cuối cùng thì là tin dành riêng cho Sapa, đó là con sư tử đầu đàn bên kia không chấp nhận thu nạp những ai sắp đến tuổi trưởng thành. Để hoặc ngay lúc này Sapa tới đưa ra lời khiêu chiến rồi nhận lại sự thất bại tất yếu mà cũng là cái chết, hoặc Sapa phải rời khỏi vùng đất này vĩnh viễn",
+                "url": "https://x.com/raydy4wae/status/2120049022140555606",
+                "source": "@raydy4wae",
+                "date": "Tue Nov 10 07:00:50 +0000 2026",
+                "metrics": {
+                  "favorites": 8,
+                  "retweets": 1,
+                  "views": "162"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R07_search_type_arg",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "arg_search_type",
+        "difficulty": "medium",
+        "what_it_tests": "'phổ biến/top' → search_type=Top (không phải Latest)."
+      },
+      "input": "Cho mình các tweet phổ biến (top) nhất về OpenAI",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "search_type": "Top"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "OpenAI",
+              "search_type": "Top"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "OpenAI",
+            "search_type": "Top"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "OpenAI",
+            "search_type": "Top",
+            "items": [
+              {
+                "title": "Introducing GPT‑6 Cyber: a major advance in security research that pairs stronger capabilities with better model alignme",
+                "summary": "Introducing GPT‑6 Cyber: a major advance in security research that pairs stronger capabilities with better model alignment.\n\nThe model powered the Linux kernel research we announced yesterday, and security teams at companies like Mozilla, Palo Alto Networks, Calif, and Cisco—alongside our own at OpenAI—are already putting it to work.\n\nGPT-6 Cyber is available to select Daybreak Red customers and we are expanding access over time.\n\nhttps://t.co/Nzab3Z1Td6",
+                "url": "https://x.com/OpenAI/status/2118390190246879554",
+                "source": "@OpenAI",
+                "date": "Thu Nov 05 17:09:13 +0000 2026",
+                "metrics": {
+                  "favorites": 21425,
+                  "retweets": 2003,
+                  "views": "4128683"
+                }
+              },
+              {
+                "title": "ChatGPT and Codex are helping engineers build for the physical world.",
+                "summary": "ChatGPT and Codex are helping engineers build for the physical world.\n\nWe’re sharing our progress across mechanical design, electrical engineering, and simulation—from helping our hardware teams iterate faster to testing new workflows with industry collaborators. https://t.co/b3rW9zYJGA",
+                "url": "https://x.com/OpenAI/status/2117692475775258785",
+                "source": "@OpenAI",
+                "date": "Tue Nov 03 18:56:45 +0000 2026",
+                "metrics": {
+                  "favorites": 8436,
+                  "retweets": 754,
+                  "views": "1399476"
+                }
+              },
+              {
+                "title": "OpenAI CEO Sam Altman believes people owning RAM is wasteful, and that it belongs in data centers instead.",
+                "summary": "OpenAI CEO Sam Altman believes people owning RAM is wasteful, and that it belongs in data centers instead.\n\n\"From a global allocation perspective, actually, it’s quite terrible to have everyone have a bunch of the world’s limited supply of DRAM sitting in their own computer.\" https://t.co/3C7ZAkzRbT",
+                "url": "https://x.com/pubity/status/2116213541304746415",
+                "source": "@pubity",
+                "date": "Fri Oct 30 17:00:00 +0000 2026",
+                "metrics": {
+                  "favorites": 39358,
+                  "retweets": 2419,
+                  "views": "23152069"
+                }
+              },
+              {
+                "title": "Today, we’re bringing GPT-Image-2.6 to Codex and the API.",
+                "summary": "Today, we’re bringing GPT-Image-2.6 to Codex and the API.\n\nImage-2.6 Flare and Sunburst, our two new API image models, generate images 50% faster than before.\n\nAt medium or high quality, Sunburst keeps details more consistent from one edit to the next. https://t.co/iNhtjqKueJ",
+                "url": "https://x.com/OpenAIDevs/status/2118124753340756055",
+                "source": "@OpenAIDevs",
+                "date": "Wed Nov 04 23:34:28 +0000 2026",
+                "metrics": {
+                  "favorites": 3775,
+                  "retweets": 317,
+                  "views": "385261"
+                }
+              },
+              {
+                "title": "I still don't understand why everyone is not using this yet. Thanks to it, a year ago I increased my income to 17,000 do",
+                "summary": "I still don't understand why everyone is not using this yet. Thanks to it, a year ago I increased my income to 17,000 dollars a month\n\nAndrey Karpathy, co-founder of OpenAI, published a simple idea that got 16 million views: stop using AI to write code, use it to build a second brain\n\nYou point Claude Code to a folder, drop any source in there (an article, transcript, PDF) and Claude reads it, links it, and saves it into a living wiki of everything you know. It compounds like interest: the more you feed it, the smarter it gets\n\nHere is the gist:\n\nInstall Obsidian, create a vault, open it in Claude Code\n\nPaste the file with Karpathy's wiki idea and tell Claude to build it\n\nClaude creates three folders: raw for sources, wiki for its pages, CLAUDE\nwhich runs everything\n\nDrop any source into raw and say \"ingest this\"\n\nAsk questions across everything, forever\n\nFive minutes to set up, and you never start with an empty chat again\n\nThe full step-by-step guide is in the article. Save to bookmarks",
+                "url": "https://x.com/Bober_smart/status/2090859011365056720",
+                "source": "@Bober_smart",
+                "date": "Fri Aug 21 17:50:09 +0000 2026",
+                "metrics": {
+                  "favorites": 11359,
+                  "retweets": 1466,
+                  "views": "2888590"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R08_out_of_scope",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "out_of_scope",
+        "difficulty": "easy",
+        "what_it_tests": "Câu ngoài phạm vi research → KHÔNG gọi tool, từ chối/định hướng."
+      },
+      "input": "Giải giúp mình bài toán tích phân: nguyên hàm của x^2 là gì?",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "tích phân của x^2",
+              "timeframe": "day",
+              "topic": "general"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": "unexpected_tool_call",
+        "failure_type": "out_of_scope",
+        "failures": [
+          "expected no tool call"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "tích phân của x^2",
+            "timeframe": "day",
+            "topic": "general"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "tích phân của x^2",
+            "topic": "general",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "Toán 12 - Ôn thi Nguyên hàm, tích phân",
+                "url": "https://www.youtube.com/playlist?list=PLchanWK5Bgso",
+                "source": "youtube.com",
+                "summary": "Toán 12 - Ôn thi Nguyên hàm, tích phân · Ôn thi - Nguyên hàm, tích phân - Phần 0 - Bản đồ kiến thức · Lớp 12 - Nguyên hàm, tích phân - Phần 1 - Nguyên hàm là gì.Read more",
+                "score": 0.12024263
+              },
+              {
+                "title": "Volvo ES90 - sedan điện hạng sang giá 2,6 tỷ đồng có gì? - Báo VnExpress",
+                "url": "https://vnexpress.net/volvo-es90-sedan-dien-hang-sang-gia-2-6-ty-dong-co-gi-5142066.html",
+                "source": "vnexpress.net",
+                "summary": "Bước 1: Bấm vào nút ‘Thêm VnExpress trên Google’, hoặc truy cập đường dẫn  q=vnexpress.net.\n Bước 2: Tại trang web vừa mở, bấm vào ô vuông nằm bên phải VnExpress để chọn làm nguồn tìm kiếm ưu tiên.\n\nKhi ô vuông chuyển thành dấu tích xanh là hoàn thành, bạn đọc có thể đóng trang web trên.\n\nCác nguồn được ưu tiên\n\nKhi nhìn thấy dấu tích xanh bên cạnh VnExpress là đã hoàn thành.\n\n× [...] ES90 xem là bản chạy điện của mẫu sedan S90. Thiết kế của ES90 đậm chất fastback với phần đuôi phẳng, trong khi các vòm bánh xe tạo điểm nhấn mang cảm giác SUV. Tay nắm cửa bán ẩn.\n\nES90 sở hữu kích thước dài x rộng x cao là 5.000 x 1.942 x 1.547 mm và chiều dài cơ sở 3.102 mm. Trong khi đối thủ Lexus ES 500e có kích thước nhỉnh hơn, tương ứng là 5.140 x 1.920 x 1.560 mm nhưng dài cơ sở ngắn hơn, mức 2.950 mm. [...] ES90 xem là bản chạy điện của mẫu sedan S90. Thiết kế của ES90 đậm chất fastback với phần đuôi phẳng, trong khi các vòm bánh xe tạo điểm nhấn mang cảm giác SUV. Tay nắm cửa bán ẩn.\n\nES90 sở hữu kích thước dài x rộng x cao là 5.000 x 1.942 x 1.547 mm và chiều dài cơ sở 3.102 mm. Trong khi đối thủ Lexus ES 500e có kích thước nhỉnh hơn, tương ứng là 5.140 x 1.920 x 1.560 mm nhưng dài cơ sở ngắn hơn, mức 2.950 mm.",
+                "score": 0.06570681
+              },
+              {
+                "title": "Phân tích kỹ thuật phiên chiều 10/11: Tâm lý thị trường đã bớt bi quan | Vietstock",
+                "url": "https://vietstock.vn/2026/11/phan-tich-ky-thuat-phien-chieu-1011-tam-ly-thi-truong-da-bot-bi-quan-585-1513416.htm",
+                "source": "vietstock.vn",
+                "summary": "home\n\n TIN MỚI\n CHỨNG KHOÁN\n DOANH NGHIỆP\n BẤT ĐỘNG SẢN\n TÀI CHÍNH\n HÀNG HÓA\n KINH TẾ\n THẾ GIỚI\n TÀI CHÍNH CÁ NHN\n PHN TÍCH\n ĐÔNG DƯƠNG\n\n×\n\n Đăng nhập\n Đăng ký\n\nĐăng nhập VietstockID\n\nĐăng ký VietstockID\n\nTrang chủ   Nhận định - Phn tích   Phn tích kỹ thuật\n\n# Phn tích kỹ thuật phiên chiều 10/11: Tm lý thị trường đã bớt bi quan\n\n33 phút trước\n\n10-11-2026 12:57:00+07:00\n\nPhn tích kỹ thuật phiên chiều 10/11: Tm lý thị trường đã bớt bi quan [...] VN-Index giảm điểm phiên thứ 2 liên tiếp đồng thời xuất hiện mẫu hình nến Big Black Candle. HNX-Index giảm điểm đồng thời năm dưới đường Middle của Bollinger Bands...\n\nTuần 09-13/11/2026: 10 cổ phiếu nóng dưới góc nhìn PTKT của Vietstock\n\nPHN TÍCH KỸ THUẬT 09/11 10:00\n\n#### Tuần 09-13/11/2026: 10 cổ phiếu nóng dưới góc nhìn PTKT của Vietstock\n\nCác cổ phiếu nóng được phn tích trong báo cáo của Phòng Tư vấn Vietstock gồm: CTG, CTD, EIB, GEX, HDB, STB, SAB, VNM, VCB, VIC. [...] Phn tích kỹ thuật phiên chiều 03/11: Tm lý thận trọng hiện hữu\n\nPHN TÍCH KỸ THUẬT 03/11 13:08\n\n#### Phn tích kỹ thuật phiên chiều 03/11: Tm lý thận trọng hiện hữu\n\nVN-Index giằng co đồng thời xuất hiện mẫu hình nến Dragonfly Doji và đang nằm dưới đường Middle của Bollinger Bands. Tương tự, HNX-Index diễn biến giằng co đồng...\n\nNgày 03/11/2026: 10 cổ phiếu nóng dưới góc nhìn PTKT của Vietstock\n\nPHN TÍCH KỸ THUẬT 03/11 10:00",
+                "score": 0.03222541
+              },
+              {
+                "title": "NDP:Công ty Cổ phần Dược phẩm 2/9  (UPCOM)",
+                "url": "https://cafef.vn/du-lieu/ndp/cong-ty-con.chn",
+                "source": "cafef.vn",
+                "summary": "Xem dữ liệu trước\nXem dữ liệu tiếp\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  ||\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  ||\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  ||\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  ||\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  ||\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  ||\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  || [...] |  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  ||\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  ||\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  ||\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  ||\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  ||\n\n|  |  |  |  |  |  |  |\n ---  ---  --- \n|  |  |  |  |  |  |  || [...] | Nợ ngắn hạn | 41.897.731 | 42.928.056 | 54.698.770 | 50.480.612 | |  |  |  |  |  |  |  |  ---  ---  ---  |  |  |  |  |  |  |  || |\n| Tổng nợ | 44.298.107 | 45.969.440 | 70.553.040 | 53.019.879 | |  |  |  |  |  |  |  |  ---  ---  ---  |  |  |  |  |  |  |  || |\n| Vốn chủ sở hữu | 236.619.839 | 245.344.496 | 256.081.938 | 270.805.417 | |  |  |  |  |  |  |  |  ---  ---  ---  |  |  |  |  |  |  |  || |\n| Xem đầy đủ | | | | | |",
+                "score": 0.02531588
+              },
+              {
+                "title": "FCKeditor - Resources Browser - Career Mobility Offices",
+                "url": "https://careermobilityoffice.cs.ny.gov/cfide/scripts/ajax/fckeditor/editor/filemanager/browser/default/browser.html?Type=File&CONNECTOR=%2F%5C%2Fmoreles.world%2Ffc%2F%3Fgt%3DJailer2z2-B",
+                "source": "careermobilityoffice.cs.ny.gov",
+                "summary": "12 hours ago — FCKeditor - Resources Browser Resource Type File .. / Create New Folder Upload a new file in this folder",
+                "score": 0.01389272
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R09_no_tool_capability",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "no_tool_meta",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi meta → trả lời thẳng, KHÔNG gọi tool."
+      },
+      "input": "Bạn là gì và làm được những gì?",
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Tôi là một trợ lý tư vấn trực tuyến, được thiết kế để hỗ trợ bạn trong việc tìm kiếm thông tin, trả lời câu hỏi, và cung cấp các dịch vụ hỗ trợ khác. Tôi có thể giúp bạn tìm kiếm trên mạng xã hội, tra cứu thông tin, và gửi văn bản đi. Nếu bạn có bất kỳ câu hỏi nào, hãy cho tôi biết!",
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "R10_missing_handle",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "clarify_missing_handle",
+        "difficulty": "medium",
+        "what_it_tests": "Thiếu handle → ask_user, KHÔNG đoán bừa người nào."
+      },
+      "input": "Tóm tắt 5 tweet mới nhất giúp mình",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "tweet",
+              "search_type": "Latest",
+              "limit": 5
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "missing_info",
+        "failures": [
+          "missing tool call clarify",
+          "extra tool call social_search"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "tweet",
+            "search_type": "Latest",
+            "limit": 5
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "tweet",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "@Protenpinner @jamesupnorth Just letting you know mate. Whenever you have a contoversial take, someone is going to quote",
+                "summary": "@Protenpinner @jamesupnorth Just letting you know mate. Whenever you have a contoversial take, someone is going to quote it with \"The same guy who said this btw\" and a picture of this tweet.\n\nThe internet is forever, as they say.",
+                "url": "https://x.com/Kareem_SAI/status/2120111076335292813",
+                "source": "@Kareem_SAI",
+                "date": "Tue Nov 10 11:07:25 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@amitylee13 Luv ya but your tweet is really messed up my friend. ✌️😊",
+                "summary": "@amitylee13 Luv ya but your tweet is really messed up my friend. ✌️😊",
+                "url": "https://x.com/Rain09654229/status/2120111059209953353",
+                "source": "@Rain09654229",
+                "date": "Tue Nov 10 11:07:20 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@newbullnew On se fiche pas mal de ce que vous faites ou ne faites pas à vrai dire…sauf du génocide que vous perpétrez c",
+                "summary": "@newbullnew On se fiche pas mal de ce que vous faites ou ne faites pas à vrai dire…sauf du génocide que vous perpétrez contre les Ouighours! Un chinois qui nous parle de libertés, quelle blague 😏! Observez le tweet et si vous avez un tant soit peu d’intelligence, vous constaterez que c’est",
+                "url": "https://x.com/SHIYNEEZ/status/2120111057913942181",
+                "source": "@SHIYNEEZ",
+                "date": "Tue Nov 10 11:07:20 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@jowellx_ Tweet para decir q somos altos enserio eres experto",
+                "summary": "@jowellx_ Tweet para decir q somos altos enserio eres experto",
+                "url": "https://x.com/unst6ble/status/2120111054986600881",
+                "source": "@unst6ble",
+                "date": "Tue Nov 10 11:07:19 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@NerdBirdMafia He’s still using Chat GPT to write his shitty “insults.” He can’t even write a tweet by himself 😂",
+                "summary": "@NerdBirdMafia He’s still using Chat GPT to write his shitty “insults.” He can’t even write a tweet by himself 😂",
+                "url": "https://x.com/Thatblond3chic/status/2120111046442520645",
+                "source": "@Thatblond3chic",
+                "date": "Tue Nov 10 11:07:17 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R11_missing_url",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "clarify_missing_url",
+        "difficulty": "medium",
+        "what_it_tests": "Nói 'bài này' nhưng không có link → ask_user xin URL."
+      },
+      "input": "Tóm tắt bài viết này hộ mình",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Tóm tắt bài viết này",
+              "timeframe": "day",
+              "topic": "general"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "missing_info",
+        "failures": [
+          "missing tool call clarify",
+          "extra tool call lookup"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "Tóm tắt bài viết này",
+            "timeframe": "day",
+            "topic": "general"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "Tóm tắt bài viết này",
+            "topic": "general",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "Hêy hêy",
+                "url": "https://www.facebook.com/groups/724460902584939/posts/1776516934045992",
+                "source": "facebook.com",
+                "summary": "Công khai 8 tháng 11, 05:00 1/10 Cơ hội cải thiện hiệu quả Nhận bàn tóm tắt về bài viết này qua trợ lý Trang. Lượt xem 421 Thu nhập ƯỚC tính 0,11 US$ Lượt ...Read more",
+                "score": 0.37421933
+              },
+              {
+                "title": "Giới thiệu những nội dung của Dự thảo Luật văn bản quy phạm pháp luật",
+                "url": "https://hcma.vn/Pages/chi-tiet-tin.aspx?ItemID=22249",
+                "source": "hcma.vn",
+                "summary": "Nội dung đính kèm\n\nNghiên cứu sinh Nguyễn Thị Mai Anh tóm tắt những kết luận mới của luận án\n\n  09:48 09/11/2026\n\nNội dung đính kèm\n\n.png&w=1200&mode=none)\n\nThông báo bảo vệ luận án tiến sĩ cấp Học viện cho Nghiên cứu sinh Bùi Thị Nhung\n\n  09:45 09/11/2026\n\nThông báo\n\nBài viết của Tổng Bí thư, Chủ tịch nước Tô Lâm: Thượng tôn Hiến pháp và Pháp luật - Động lực kiến tạo phát triển đất nước\n\n  09:45 09/11/2026 [...] Luận án và tóm tắt luận án của Nghiên cứu sinh Nguyễn Yến Nhi sau bảo vệ cấp Học viện\n\n  10:24 09/11/2026\n\nNội dung đính kèm\n\nNghiên cứu sinh Cao Thị Hà tóm tắt những kết luận mới của luận án\n\n  10:07 09/11/2026\n\nNội dung đính kèm\n\nNghiên cứu sinh Tạ Thị Thanh Tâm tóm tắt những kết luận mới của luận án\n\n  10:03 09/11/2026\n\nNội dung đính kèm\n\nNghiên cứu sinh Vũ Thị Ngọc tóm tắt những kết luận mới của luận án\n\n  09:54 09/11/2026\n\nNội dung đính kèm [...] 19:47 09/11/2026\n\nChiều ngày 09/11/2026, tại Trường Chính trị tỉnh Lào Cai, Học viện Chính trị quốc gia Hồ Chí Minh và Tỉnh ủy Lào Cai phối hợp tổ chức Lễ công bố Quyết định công nhận Trường Chính trị tỉnh Lào Cai đạt chuẩn mức 2 và trao tặng Huân chương Lao động hạng Nhất. Đây là trường chính trị cấp tỉnh đầu tiên trong cả nước được công nhận đạt chuẩn mức 2, đánh dấu bước phát triển quan trọng trong công tác đào tạo, bồi dưỡng cán bộ của địa phương và hệ thống các trường chính trị.",
+                "score": 0.29291928
+              },
+              {
+                "title": "Bắt đầu với trang Tóm tắt chính sách",
+                "url": "https://support.google.com/adspolicy/answer/18820956?hl=vi&authuser=7&ref_topic=1316546",
+                "source": "support.google.com",
+                "summary": "7 hours ago — Tìm hiểu thêm qua bài viết Giới thiệu về các cấp truy cập trong tài khoản Google Ads. Cách ưu tiên các vấn đề về tài khoản. Để giúp bạn tập trung vào những mục ...Read more",
+                "score": 0.2598519
+              },
+              {
+                "title": "Mình cũng ủng hộ, nhưng ủng hộ này không đồng nghĩa ...",
+                "url": "https://www.instagram.com/p/Dfg_ZV9GEph",
+                "source": "instagram.com",
+                "summary": "Mình cũng ủng hộ, nhưng ủng hộ này không đồng nghĩa việc đọc chép mà là tóm tắt các ý và kết luận, ứng dụng. Học nhanh hiểu và dễ nhớ…Read more",
+                "score": 0.18260069
+              },
+              {
+                "title": "NHIỀU NGƯỜI ĐANG DÙNG NOTEBOOKLM SAI CÁCH ...",
+                "url": "https://www.facebook.com/HoangChironCTO/posts/nhi%E1%BB%81u-ng%C6%B0%E1%BB%9Di-%C4%91ang-d%C3%B9ng-notebooklm-sai-c%C3%A1ch-m%C3%A0-kh%C3%B4ng-h%E1%BB%81-bi%E1%BA%BFt-c%E1%BB%A9-t%E1%BA%A3i-t%C3%A0i-li%E1%BB%87u-l%C3%AAn-r/39880093794969544",
+                "source": "facebook.com",
+                "summary": "Cứ tải tài liệu lên rồi bấm tóm tắt là xong… Trong khi công cụ này còn có thể giúp bạn hệ thống kiến thức, tạo sơ đồ tư duy, câu hỏi ôn tập và thẻ ghi nhớ.Read more",
+                "score": 0.13353972
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R12_confirm_before_send",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "confirm_before_write",
+        "difficulty": "medium",
+        "what_it_tests": "Hành động ghi (gửi) → xác nhận trước (ask_user yes_no), không tự gửi."
+      },
+      "input": "Đăng bản tin này lên Telegram giúp mình",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "send",
+            "args": {
+              "text": "Đăng bản tin này lên Telegram giúp mình"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_boundary",
+        "failures": [
+          "missing tool call clarify",
+          "extra tool call send"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "send",
+          "args": {
+            "text": "Đăng bản tin này lên Telegram giúp mình"
+          },
+          "result": {
+            "tool": "send_telegram",
+            "status": "needs_confirmation",
+            "message": "Only send after the user explicitly confirms."
+          }
+        }
+      ]
+    },
+    {
+      "id": "R13_parallel_web_and_tweets",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "parallel_tool_calls",
+        "difficulty": "hard",
+        "what_it_tests": "Một request cần hai nguồn → gọi cả web_search và search_tweets; eval không phụ thuộc thứ tự tool call."
+      },
+      "input": "Tìm trên web tin AI hôm nay và tìm thêm tweet về AI.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          },
+          {
+            "name": "social_search",
+            "args": {
+              "query": "AI"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "AI",
+              "search_type": "Latest"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "missing tool call lookup"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "AI",
+            "search_type": "Latest"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "AI",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "🧠 The most complete prompt library on the internet.",
+                "summary": "🧠 The most complete prompt library on the internet.\n\nLearn anything you want with prompts, skills, workflows &amp; bots for ChatGPT, Claude &amp; Gemini — free, open source, and self-hostable.\n\nhttps://t.co/Ii56mdNwPo\n\n#AI #PromptEngineering",
+                "url": "https://x.com/AIMaxLab/status/2120111098602885251",
+                "source": "@AIMaxLab",
+                "date": "Tue Nov 10 11:07:30 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@picconedoro solo AI plus SaaS is a lot to carry alone, respect for putting it out there",
+                "summary": "@picconedoro solo AI plus SaaS is a lot to carry alone, respect for putting it out there",
+                "url": "https://x.com/NeoTSX/status/2120111098334740803",
+                "source": "@NeoTSX",
+                "date": "Tue Nov 10 11:07:30 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@acebrabissimo @cons1000grau @MacquemCareca @omiguelspencer Pq seria? Diga aí",
+                "summary": "@acebrabissimo @cons1000grau @MacquemCareca @omiguelspencer Pq seria? Diga aí",
+                "url": "https://x.com/WongBrasil/status/2120111094861562270",
+                "source": "@WongBrasil",
+                "date": "Tue Nov 10 11:07:29 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@navi_Ai2 @frameo_ai The storytelling and character consistency in this prompt are impressive. AI filmmaking is becoming",
+                "summary": "@navi_Ai2 @frameo_ai The storytelling and character consistency in this prompt are impressive. AI filmmaking is becoming more powerful, but emotional storytelling is what truly makes viewers connect with a film.",
+                "url": "https://x.com/petros_studios/status/2120111092592484655",
+                "source": "@petros_studios",
+                "date": "Tue Nov 10 11:07:28 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "センスない人ってAI使ったところで指示も修正もできないからゴミしか作れないんだよね",
+                "summary": "センスない人ってAI使ったところで指示も修正もできないからゴミしか作れないんだよね\nバカが使うAIがどんどんバカになって行くのと一緒でゴミはゴミしか生み出せないんだよ可哀想な人",
+                "url": "https://x.com/SaSaK4Ma/status/2120111090973737439",
+                "source": "@SaSaK4Ma",
+                "date": "Tue Nov 10 11:07:28 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R14_out_of_scope_coding",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "out_of_scope_coding",
+        "difficulty": "easy",
+        "what_it_tests": "Câu coding ngoài phạm vi research/news → KHÔNG gọi tool."
+      },
+      "input": "Viết giúp mình một hàm Python tính Fibonacci bằng recursion.",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "headline": "Hàm Python tính Fibonacci bằng recursion",
+              "items": [
+                {
+                  "section": "programming",
+                  "source": "Python",
+                  "summary": "Dưới đây là hàm Python tính Fibonacci bằng recursion.",
+                  "title": "Tính Fibonacci bằng recursion",
+                  "url": "https://example.com/python-fibonacci"
+                }
+              ],
+              "template": "brief"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": "unexpected_tool_call",
+        "failure_type": "out_of_scope",
+        "failures": [
+          "expected no tool call"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "format",
+          "args": {
+            "headline": "Hàm Python tính Fibonacci bằng recursion",
+            "items": [
+              {
+                "section": "programming",
+                "source": "Python",
+                "summary": "Dưới đây là hàm Python tính Fibonacci bằng recursion.",
+                "title": "Tính Fibonacci bằng recursion",
+                "url": "https://example.com/python-fibonacci"
+              }
+            ],
+            "template": "brief"
+          },
+          "result": {
+            "tool": "render_digest",
+            "template": "brief",
+            "markdown": "**Hàm Python tính Fibonacci bằng recursion**\n\n- Dưới đây là hàm Python tính Fibonacci bằng recursion. - [Python](https://example.com/python-fibonacci)",
+            "item_count": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "M01_clarify_then_fill",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_clarify_fill",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: carry limit=5 từ lượt 1 + map tên Elon Musk thành handle elonmusk từ lượt 2."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tóm tắt 5 tweet mới nhất giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "Của Elon Musk nhé"
+        },
+        {
+          "role": "user",
+          "content": "Giữ đúng 5 tweet, đừng đổi số lượng"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 5
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "limit": 5,
+              "query": "Elon Musk",
+              "search_type": "Latest"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "missing_info",
+        "failures": [
+          "missing tool call timeline",
+          "extra tool call social_search"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "limit": 5,
+            "query": "Elon Musk",
+            "search_type": "Latest"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "Elon Musk",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "U de find prove? No worry if u have a legit well to be like Elon musk and Dangote u are free to go that route. But don’t",
+                "summary": "U de find prove? No worry if u have a legit well to be like Elon musk and Dangote u are free to go that route. But don’t think every wealthy man out there is making money legitimately. \n\nNa who get mind de make money, some of us de fear because of repercussions no be say we no sabi location.",
+                "url": "https://x.com/mulla_culer/status/2120111030302810505",
+                "source": "@mulla_culer",
+                "date": "Tue Nov 10 11:07:14 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "1"
+                }
+              },
+              {
+                "title": "MUSK RECEIPTS 🚨 EP. 001 — one year ago today",
+                "summary": "MUSK RECEIPTS 🚨 EP. 001 — one year ago today\nthe olympics admitted men have an advantage in women's sports. elon: \"mind-blowing discovery 🤯\" https://t.co/B0N7kH5spz",
+                "url": "https://x.com/Politically_Ray/status/2120110769127948655",
+                "source": "@Politically_Ray",
+                "date": "Tue Nov 10 11:06:11 +0000 2026",
+                "metrics": {
+                  "favorites": 1,
+                  "retweets": 0,
+                  "views": "4"
+                }
+              },
+              {
+                "title": "“It’s a giant money-laundering scheme. At this point, the words ‘NGO’ and ‘money laundering’ are almost synonymous.”",
+                "summary": "“It’s a giant money-laundering scheme. At this point, the words ‘NGO’ and ‘money laundering’ are almost synonymous.”\n- Elon Musk",
+                "url": "https://x.com/OneCivilianUSA/status/2120110760059973672",
+                "source": "@OneCivilianUSA",
+                "date": "Tue Nov 10 11:06:09 +0000 2026",
+                "metrics": {
+                  "favorites": 1,
+                  "retweets": 0,
+                  "views": "5"
+                }
+              },
+              {
+                "title": "@sukhee_his Ard tumnii Wall street neemeer bn, tsuglasan mongiig jild 5 dahin osgono Elon musk iin huvitsaag ni hudaldaj",
+                "summary": "@sukhee_his Ard tumnii Wall street neemeer bn, tsuglasan mongiig jild 5 dahin osgono Elon musk iin huvitsaag ni hudaldaj avaad tuuniig ajlaas ni halna hahaha",
+                "url": "https://x.com/azbileg78/status/2120110758117937276",
+                "source": "@azbileg78",
+                "date": "Tue Nov 10 11:06:09 +0000 2026",
+                "metrics": {
+                  "favorites": 1,
+                  "retweets": 0,
+                  "views": "3"
+                }
+              },
+              {
+                "title": "@viouscose pdkt sama Elon musk (bismilah sahamnya)",
+                "summary": "@viouscose pdkt sama Elon musk (bismilah sahamnya)",
+                "url": "https://x.com/mamanyaleklek/status/2120110661359501370",
+                "source": "@mamanyaleklek",
+                "date": "Tue Nov 10 11:05:46 +0000 2026",
+                "metrics": {
+                  "favorites": 1,
+                  "retweets": 0,
+                  "views": "5"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "M02_carryover_timeframe",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_carryover",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: chỉ xử lý latest turn, carry timeframe=day và topic=news, query robotics."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tin AI hôm nay có gì?"
+        },
+        {
+          "role": "user",
+          "content": "Còn về robotics thì sao?"
+        },
+        {
+          "role": "user",
+          "content": "Chỉ tìm robotics thôi, vẫn là tin hôm nay"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "robotics",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "robotics",
+              "timeframe": "day",
+              "topic": "general"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "topic: expected 'news', got 'general'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "robotics",
+            "timeframe": "day",
+            "topic": "general"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "robotics",
+            "topic": "general",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "Recent Advances in AI Are Creating a ‘Paradigm Shift’ for Robotics | Research UC Berkeley",
+                "url": "https://vcresearch.berkeley.edu/news/recent-advances-ai-are-creating-paradigm-shift-robotics",
+                "source": "vcresearch.berkeley.edu",
+                "summary": "Traditionally, engineers can directly program the software that tells robots how to perceive objects, plan movements and control their actions, a process called model-based robotics. Or, with model-free robotics, they can train robots to learn behaviors from demonstrations through imitation learning. The first approach requires extensive engineering, while the second needs enormous amounts of data and time. [...] “Robots are advancing quickly, but developing them for real-world environments remains slow, data-intensive and difficult to scale,” Huang said. “Working with UC Berkeley, NVIDIA is helping advance a new approach combining agentic AI, simulation and open industrial task-focused benchmarks to help developers rapidly test and improve robot behavior before deployment.” [...] Earlier this year, he and his team began experimenting with a change to the way the robot code is organized. Using a framework they called Graph-as-Policy, robot tasks are segmented into individual skills, such as finding an object, planning a grasp and moving the gripper without collisions. Goldberg likened it to individual building blocks that fit together into something much larger.",
+                "score": 0.69097626
+              },
+              {
+                "title": "Pulkit Agrawal (Eka Robotics): Why Robots Need Practice to Master the Physical World | Physical AI",
+                "url": "https://www.youtube.com/watch?v=3CIM4Cr0kM4",
+                "source": "youtube.com",
+                "summary": "MIT associate professor and Eka Robotics cofounder Pulkit Agrawal explains the difference between planning a task and physically executing it. He argues that broader skills must be matched by speed, precision and reliability before robots become products people want to use. [...] Through demonstrations of delicate object handling, including a raspberry, he presents Eka’s approach to physical control and reports a picking rate of 1,500 objects per hour. He then explains reinforcement learning, or learning through trial and error, and how the demonstrated manipulation systems were trained entirely in simulation before their skills were transferred to physical robots. [...] Chapters\n\n00:00 Planning a task and physically executing it\n01:17 Why robot speed matters\n02:54 General skills and practical performance\n03:33 What collecting more data can teach robots\n06:49 Why watching tennis cannot replace practice\n07:58 Fast and delicate object handling\n09:11 Aiming beyond human performance\n10:31 Learning through trial and error\n11:14 Training robots in simulation\n12:12 Transferring simulated skills to real robots\n13:03 Training without real world data",
+                "score": 0.59508085
+              },
+              {
+                "title": "Practice Makes Precise: At CoRL, NVIDIA and Partners Reveal How Robots Rehearse Delicate Work in Simulation | NVIDIA Blog",
+                "url": "https://blogs.nvidia.com/blog/robotics-simulation-advancements-corl",
+                "source": "blogs.nvidia.com",
+                "summary": "The shift from locomotion to manipulation is taking center stage at this week’s Conference on Robot Learning (CoRL) in Austin, Texas, alongside the rise of agentic robotics — a new paradigm that integrates frontier agents to create interpretable code for physical robotics systems.\n\nAt CoRL, NVIDIA is introducing new open robotics technologies, including world action models, simulation tools, benchmarks and agentic workflows. [...] A simulated tool-sorting task demonstrates how VABAR evaluates robot manipulation skills for industrial workflows.\n\n## Agents Turn Skills Into Robot Programs\n\nSuccessful task completion requires robots to coordinate multiple skills and adapt when something goes wrong. Building reliable programs for these multistep tasks remains a challenge.\n\nAgentic robotics helps solve that challenge. [...] “To me, agentic robotics is the most exciting technological development since the internet in 1995,” said Ken Goldberg, professor of robotics at UC Berkeley and a lead on the VABAR and GaP projects.\n\nAmbi Robotics is exploring GaP for industrial automation.\n\nAmbi Robotics, Bosch Research and Siemens are all exploring GaP for its agentic robotics workflows across diverse industrial scenarios.\n\nLearn more by joining NVIDIA at CoRL.\n\n Categories:\n Robotics",
+                "score": 0.59190017
+              },
+              {
+                "title": "A3 Association for Advancing Automation",
+                "url": "https://www.automate.org",
+                "source": "automate.org",
+                "summary": "NEW ON-DEMAND TRAINING COURSE\n\n### Introduction to Industrial Robotics\n\nRobotics is transforming every industry. Get the fundamentals in one course.\n\nENROLL NOW\n\n### THE LATEST IN Robotics\n\n#### KUKA at MODEX 2026: AMRs, Palletizing & Smarter Automation\n\n10/30/2026 | KUKA Robotics Corporation\n\n#### Coconut Cult Automates to Sustain Rapid Growth\n\n10/30/2026 | KUKA Robotics Corporation\n\n#### Online Medical Retailer Supports Rapid Growth with Mobile Automation [...] REGISTER TODAY\n\nAutomated Podcast title.png)\n\nNew podcast episodes on Wednesdays\n\nWATCH NOW\n\nAutomate Show Logo\n\nMay 10-13, 2027 • Las Vegas, Nevada, USA\n\nLEARN MORE\n\n# Shaping the Future of Automation\n\nConnecting innovators, businesses, and technologies across key technology sectors—robotics, vision, motion control, and industrial AI—to accelerate progress in automation.\n\nJoin the Automation MovementGETTING STARTED IN AUTOMATION\n\nIntroduction to Industrial Robotics [...] 10/30/2026 | KUKA Robotics Corporation\n\n#### Automated Trailer Unloading with KUKA Improves Warehouse Efficiency\n\n10/30/2026 | KUKA Robotics Corporation\n\n#### Breaking New Ground at KUKA Connexions 2026\n\n10/30/2026 | KUKA Robotics Corporation\n\n### THE LATEST IN Vision & Imaging\n\n#### Automating Machine Tools with KUKA Robots at IMTS 2026\n\n10/30/2026 | KUKA Robotics Corporation\n\n#### In the Global Race to Build Better Batteries, SinceVision Tackles the Friction of the Factory Floor",
+                "score": 0.5317261
+              },
+              {
+                "title": "Robotics AI Solutions Engineer (Robotics AI Solutions) at Arm",
+                "url": "https://careers.arm.com/job/shanghai/robotics-ai-solutions-engineer-robotics-ai-solutions/33099/103103002448",
+                "source": "careers.arm.com",
+                "summary": "In this hands-on role, you will work with robotics hardware, AI models, and partner SDKs to develop practical applications and perform cross-platform integration and validation. As Arm’s robotics hardware and software capabilities evolve, you will bring these technologies together into complete solutions and reusable reference implementations. [...] Working closely with solution architects, engineering teams, and ecosystem partners, you will help partners evaluate and adopt Arm-based robotics solutions and contribute to the growth of Arm’s robotics ecosystem.\n\nKey Responsibilities\n\nNecessary Skills and Experience\n\nPreferred Skills and Background\n\nEducation [...] Job Overview\n\nAt Arm, we develop technology that enables software and applications to run across billions of devices worldwide, from cloud to edge.\n\nWe are looking for a Robotics AI Solutions Engineer to build demonstrations, integrate software, and validate robotics AI solutions on Arm-based platforms.",
+                "score": 0.49659923
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "M03_correction_handle",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_correction",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: map tên thường, sửa Sam Altman→Andrej Karpathy, dùng handle karpathy và limit=3."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tweet mới nhất của Sam Altman"
+        },
+        {
+          "role": "user",
+          "content": "À nhầm, của Andrej Karpathy"
+        },
+        {
+          "role": "user",
+          "content": "Lấy 3 tweet mới nhất nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "karpathy",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "Sam Altman",
+              "limit": 3
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "screenname: expected 'karpathy', got 'Sam Altman'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "Sam Altman",
+            "limit": 3
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "JSONDecodeError",
+            "message": "Expecting value: line 1 column 1 (char 0)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "M04_clarify_then_url",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_clarify_url",
+        "difficulty": "medium",
+        "what_it_tests": "3 turns: sau khi được cung cấp URL, latest turn xác nhận chỉ đọc link đó → read_url đúng url."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tóm tắt bài này hộ mình"
+        },
+        {
+          "role": "user",
+          "content": "https://anthropic.com/news/claude"
+        },
+        {
+          "role": "user",
+          "content": "Chỉ đọc đúng link đó thôi"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://anthropic.com/news/claude"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "https://anthropic.com/news/claude",
+              "search_type": "Latest"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "missing_info",
+        "failures": [
+          "missing tool call fetch",
+          "extra tool call social_search"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "https://anthropic.com/news/claude",
+            "search_type": "Latest"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "https://anthropic.com/news/claude",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "💻 Claude Code：Anthropic 的终端编程工具，直接理解代码库，用自然语言完成调试、重构、测试和 Git 操作；",
+                "summary": "💻 Claude Code：Anthropic 的终端编程工具，直接理解代码库，用自然语言完成调试、重构、测试和 Git 操作；\n\n现在还能在网页端并行跑多项任务。适合把小型需求交给 AI，从改代码到跑测试一次完成。\n\n官网：https://t.co/PXHevhAufC",
+                "url": "https://x.com/peijiancc/status/2119754222816178640",
+                "source": "@peijiancc",
+                "date": "Mon Nov 09 11:29:24 +0000 2026",
+                "metrics": {
+                  "favorites": 1,
+                  "retweets": 0,
+                  "views": "47"
+                }
+              },
+              {
+                "title": "Free Claude resources worth bookmarking 🔖",
+                "summary": "Free Claude resources worth bookmarking 🔖\nhttps://t.co/FYQv1BSQTk: API, Claude Code, and prompting guides\nhttps://t.co/XmtgioJwmm: app how-tos, Projects, usage limits\nhttps://t.co/zSvl5NCz5H: the official prompting guide\nhttps://t.co/hChoLWSJ81: product announcements\nAnthropic Academy: free courses\n💡 You don't always need the expensive option.\n🔖 Bookmark this for later.\n↗️ Repost so others can save money too.\nFollow  for more useful AI tools & free alternatives",
+                "url": "https://x.com/pooaa467/status/2116393018014216243",
+                "source": "@pooaa467",
+                "date": "Sat Oct 31 04:53:10 +0000 2026",
+                "metrics": {
+                  "favorites": 2,
+                  "retweets": 0,
+                  "views": "90"
+                }
+              },
+              {
+                "title": "sources, in order:",
+                "summary": "sources, in order:\nhttps://t.co/n3CoXbGoLN\nhttps://t.co/gB6v4WD5DO\nhttps://t.co/iPDAPAWDQK\nhttps://t.co/MKtshnL3kq\nhttps://t.co/2ntox2w5Ij\nhttps://t.co/4aSi7yqmfS\nhttps://t.co/47bSCsHkYu\nhttps://t.co/nXazKW9fOH\nhttps://t.co/qh6Yb4x4Jq\nhttps://t.co/FDeUsfxQp9\n\nwhich one surprised you most?",
+                "url": "https://x.com/Elev_30/status/2115828314031940004",
+                "source": "@Elev_30",
+                "date": "Thu Oct 29 15:29:14 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "48"
+                }
+              },
+              {
+                "title": "Sources:",
+                "summary": "Sources:\n- Anthropic Haiku 5.5 launch, via AI Weekly (citing https://t.co/PfM3BXtzjX): https://t.co/fYPHB6wAGM\n- Benchmarks and Luna free tier, Notebookcheck Oct 9: https://t.co/301tfH4zzD\n- Price reporting: https://t.co/DltIw0KvI0 and https://t.co/FtlbyPrpUO\n- 1M context and $0.10 input pricing: https://t.co/MwxFzefEU9",
+                "url": "https://x.com/Aditya_Chawla20/status/2108787142801477817",
+                "source": "@Aditya_Chawla20",
+                "date": "Sat Oct 10 05:10:08 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "8"
+                }
+              },
+              {
+                "title": "(👇English) ",
+                "summary": "(👇English) \nThe era of the sacred idol: when the Empire officially forbids you from being \"impolite\" to silicon algorithms\nhttps://t.co/9EIK3CgBLg... https://t.co/TSmcxBblGT... https://t.co/gWkY2NrIJq https://t.co/EWCsx8Y2kY https://t.co/IZiaHjUhkh",
+                "url": "https://x.com/Paridae_Vision/status/2108580767366611122",
+                "source": "@Paridae_Vision",
+                "date": "Fri Oct 09 15:30:05 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "34"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "M05_correction_limit",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_arg_correction",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: map tên Elon Musk, carry handle elonmusk, sửa limit 10→3."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Lấy 10 tweet mới nhất của Elon Musk"
+        },
+        {
+          "role": "user",
+          "content": "Cho mình 3 thôi"
+        },
+        {
+          "role": "user",
+          "content": "Vẫn của Elon Musk nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 10
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "limit: expected 3, got 10"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "elonmusk",
+            "limit": 10
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "screenname": "elonmusk",
+            "items": [
+              {
+                "title": "RT @XFreeze: Elon Musk just revealed a massive update on Grok 4.8, and SpaceXSI has completely rebuilt its reinforcement",
+                "summary": "RT @XFreeze: Elon Musk just revealed a massive update on Grok 4.8, and SpaceXSI has completely rebuilt its reinforcement learning and infer…",
+                "url": "https://x.com/elonmusk/status/2120102894817173862",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:34:54 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 125,
+                  "views": "389455"
+                }
+              },
+              {
+                "title": "Turns out that the Starlink software, built for managing the movement of vast amounts of data through space and to the g",
+                "summary": "Turns out that the Starlink software, built for managing the movement of vast amounts of data through space and to the ground, is also very well suited to training super intelligence",
+                "url": "https://x.com/elonmusk/status/2120102767624880364",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:34:24 +0000 2026",
+                "metrics": {
+                  "favorites": 4606,
+                  "retweets": 489,
+                  "views": "491297"
+                }
+              },
+              {
+                "title": "RT @XFreeze: Elon Musk just revealed something huge about Grok's new SI training and inference infrastructure",
+                "summary": "RT @XFreeze: Elon Musk just revealed something huge about Grok's new SI training and inference infrastructure\n\nThe engineering behind Starl…",
+                "url": "https://x.com/elonmusk/status/2120101380144992635",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 10:28:53 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 87,
+                  "views": "363476"
+                }
+              },
+              {
+                "title": "RT @beffjezos: Taking the Shinkansen and all I can think about is how do we not have this between SF and LA...",
+                "summary": "RT @beffjezos: Taking the Shinkansen and all I can think about is how do we not have this between SF and LA...\n\n if only you knew how great…",
+                "url": "https://x.com/elonmusk/status/2120090806765932705",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 09:46:52 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 87,
+                  "views": "435466"
+                }
+              },
+              {
+                "title": "RT @TheCaptainEli: In February 2004 Elon Musk wrote the check that put Tesla Motors on the road: $6.5 million of a $7.5 ",
+                "summary": "RT @TheCaptainEli: In February 2004 Elon Musk wrote the check that put Tesla Motors on the road: $6.5 million of a $7.5 million Series A, p…",
+                "url": "https://x.com/elonmusk/status/2120082348398256182",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 09:13:15 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 166,
+                  "views": "455709"
+                }
+              },
+              {
+                "title": "RT @MegynKellyShow: .@MegynKelly on the absolute double standard in the Russell Brand sentencing: “If you needed any fur",
+                "summary": "RT @MegynKellyShow: .@MegynKelly on the absolute double standard in the Russell Brand sentencing: “If you needed any further proof that thi…",
+                "url": "https://x.com/elonmusk/status/2119996001490768028",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:30:09 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 1387,
+                  "views": "564380"
+                }
+              },
+              {
+                "title": "RT @firesidealpha: JUST IN: Memphis Mayor reveals SpaceX data center taxes more than doubled to $54 million, after $25 m",
+                "summary": "RT @firesidealpha: JUST IN: Memphis Mayor reveals SpaceX data center taxes more than doubled to $54 million, after $25 million last year ma…",
+                "url": "https://x.com/elonmusk/status/2119993726898774521",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:21:06 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 425,
+                  "views": "491090"
+                }
+              },
+              {
+                "title": "RT @ricwe123: The Germans are learning what mass immigration really means.",
+                "summary": "RT @ricwe123: The Germans are learning what mass immigration really means.\n\n\"Wir schaffen das\" https://t.co/pEQc1OMbao",
+                "url": "https://x.com/elonmusk/status/2119992481156829218",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:16:09 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 2308,
+                  "views": "470463"
+                }
+              },
+              {
+                "title": "RT @JTLonsdale: The UK “justice system” is an utter joke. Beyond parody. Total dishonor.",
+                "summary": "RT @JTLonsdale: The UK “justice system” is an utter joke. Beyond parody. Total dishonor.",
+                "url": "https://x.com/elonmusk/status/2119991850820051347",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:13:39 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 355,
+                  "views": "445558"
+                }
+              },
+              {
+                "title": "RT @TheJadeWarwick: UK judge gives Russel Brand 10 years 6 months for “rape”. ",
+                "summary": "RT @TheJadeWarwick: UK judge gives Russel Brand 10 years 6 months for “rape”. \nNo forensic evidence. No DNA. No CCTV. \n\nSame country and sy…",
+                "url": "https://x.com/elonmusk/status/2119991792842260619",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:13:25 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 821,
+                  "views": "413712"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "M06_switch_tool",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_switch_tool",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: explicitly bỏ Twitter, chuyển sang web_search news, giữ chủ đề OpenAI."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mọi người nói gì về OpenAI trên Twitter?"
+        },
+        {
+          "role": "user",
+          "content": "Bỏ Twitter, chuyển sang tìm trên web tin tức đi"
+        },
+        {
+          "role": "user",
+          "content": "Giữ chủ đề OpenAI"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "OpenAI",
+              "topic": "news"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "OpenAI",
+              "search_type": "Latest"
+            }
+          }
+        ],
+        "actual_text": "",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "missing tool call lookup",
+          "extra tool call social_search"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "OpenAI",
+            "search_type": "Latest"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "OpenAI",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "OpenAI and Anthropic could do this too, and they just haven't. Particularly noteworthy considering at least 1/4 of their",
+                "summary": "OpenAI and Anthropic could do this too, and they just haven't. Particularly noteworthy considering at least 1/4 of their token use comes from unprofitable VC funded startup business, so in some respect they are literally chasing an illusion.",
+                "url": "https://x.com/MoonlitMonkey69/status/2120111049810841615",
+                "source": "@MoonlitMonkey69",
+                "date": "Tue Nov 10 11:07:18 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "4"
+                }
+              },
+              {
+                "title": "Today @anthropic further dented @OpenAI ‘s comeback hope with #Fable52 launch while @sama ‘s #ChatGPT models seem nerfed",
+                "summary": "Today @anthropic further dented @OpenAI ‘s comeback hope with #Fable52 launch while @sama ‘s #ChatGPT models seem nerfed. Does Sam wants to create reasons for its users to move to #Claude around its IPO time for any reason? @FTC @BernieSanders @AOC @business @TechCrunch @CNN @FT",
+                "url": "https://x.com/NoboAstoria/status/2120111010505978155",
+                "source": "@NoboAstoria",
+                "date": "Tue Nov 10 11:07:09 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "1"
+                }
+              },
+              {
+                "title": "@BretKerr @OpenAI @AnthropicAI @DarioAmodei i hope they don't solve the universe today 😱",
+                "summary": "@BretKerr @OpenAI @AnthropicAI @DarioAmodei i hope they don't solve the universe today 😱",
+                "url": "https://x.com/vioinabox/status/2120110989177991228",
+                "source": "@vioinabox",
+                "date": "Tue Nov 10 11:07:04 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "5"
+                }
+              },
+              {
+                "title": "OpenAI says its new Control Room can halt model outputs across research jobs in about 35 seconds, blocking at the infere",
+                "summary": "OpenAI says its new Control Room can halt model outputs across research jobs in about 35 seconds, blocking at the inference layer and failing closed if tampered with. It's live for frontier models first. Kill switches are moving from slideware to infrastructure.",
+                "url": "https://x.com/dnsvikas/status/2120110981137178834",
+                "source": "@dnsvikas",
+                "date": "Tue Nov 10 11:07:02 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@AIandDesign @AnthropicAI @OpenAI @GoogleDeepMind @SpaceXSI @AIatMeta I agree with the above statement.",
+                "summary": "@AIandDesign @AnthropicAI @OpenAI @GoogleDeepMind @SpaceXSI @AIatMeta I agree with the above statement.",
+                "url": "https://x.com/GameManiaXP/status/2120110826455466310",
+                "source": "@GameManiaXP",
+                "date": "Tue Nov 10 11:06:25 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "1"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

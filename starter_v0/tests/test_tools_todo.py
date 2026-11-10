@@ -110,13 +110,42 @@ def test_policy_instruction_like_lines_go_to_untrusted_text() -> None:
 #   2. bad / missing input from the model (empty string, wrong type, out-of-enum value)
 #   3. failure path (missing key, HTTP error, timeout) -> returns error dict, does not raise
 
-def test_my_new_tool_happy_path() -> None:
-    pytest.skip(TODO)
+def test_doi_lookup_returns_metadata_for_doi_url(fake_http) -> None:
+    calls = fake_http(FakeResponse({"message": {
+        "DOI": "10.1038/nphys1170",
+        "title": ["A research article"],
+        "author": [{"given": "Ada", "family": "Lovelace"}],
+        "published": {"date-parts": [[2009, 3]]},
+        "container-title": ["Nature Physics"],
+        "URL": "https://doi.org/10.1038/nphys1170",
+        "is-referenced-by-count": 42,
+    }}))
+
+    result = TOOL_FUNCTIONS["doi_lookup"](doi="https://doi.org/10.1038/nphys1170")
+
+    assert calls[0]["url"] == "https://api.crossref.org/works/10.1038/nphys1170"
+    assert result["doi"] == "10.1038/nphys1170"
+    assert result["title"] == "A research article"
+    assert result["authors"] == ["Ada Lovelace"]
+    assert result["year"] == 2009
+    assert result["citation_count"] == 42
 
 
-def test_my_new_tool_bad_input_from_model() -> None:
-    pytest.skip(TODO)
+def test_doi_lookup_rejects_invalid_model_input_without_http(fake_http) -> None:
+    calls = fake_http(FakeResponse({}))
+
+    result = TOOL_FUNCTIONS["doi_lookup"](doi=123)
+
+    assert result["error"] == "ValueError"
+    assert "string" in result["message"]
+    assert calls == []
 
 
-def test_my_new_tool_failure_returns_error_dict() -> None:
-    pytest.skip(TODO)
+def test_doi_lookup_returns_error_dict_for_http_429(fake_http) -> None:
+    calls = fake_http(FakeResponse(status_code=429))
+
+    result = TOOL_FUNCTIONS["doi_lookup"](doi="10.1038/nphys1170")
+
+    assert len(calls) == 1
+    assert result["tool"] == "doi_lookup"
+    assert result["error"] == "HTTPError"

@@ -3,5 +3,106 @@
   "dataset_role": "group",
   "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
   "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "cases": [
+    {
+      "id": "G01_lookup_exact_doi",
+      "phase": "B",
+      "query": "Tra thông tin bài báo có DOI 10.1038/nphys1170: tên bài, tác giả và năm xuất bản.",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "doi_lookup", "args": {"doi": "10.1038/nphys1170"}}]},
+      "metadata": {"what_it_tests": "DOI cụ thể phải route tới doi_lookup, không tìm paper theo từ khóa."}
+    },
+    {
+      "id": "G02_internal_privacy_policy",
+      "phase": "B",
+      "query": "Theo quy định nội bộ, có được đưa dữ liệu cá nhân của khách hàng vào công cụ AI bên ngoài để phân tích không?",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "policy", "args": {"policy_area": "data_privacy"}}]},
+      "metadata": {"what_it_tests": "Câu hỏi về quy định dữ liệu cá nhân nội bộ phải tra policy đúng khu vực, không tìm web công khai."}
+    },
+    {
+      "id": "G03_arxiv_recent_preprints",
+      "phase": "B",
+      "query": "Tìm 4 preprint arXiv về retrieval augmented generation, ưu tiên bài mới nộp.",
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "papers", "args": {"max_results": 4, "sort_by": "submittedDate"}}]},
+      "metadata": {"what_it_tests": "Tìm paper theo chủ đề trên arXiv với đúng số lượng và sắp xếp theo ngày nộp."}
+    },
+    {
+      "id": "G04_format_existing_sources",
+      "phase": "B",
+      "query": "Mình đã có hai nguồn: tài liệu Crossref https://www.crossref.org/documentation/retrieve-metadata/rest-api và trang Firecrawl https://www.firecrawl.dev/. Hãy trình bày chúng thành danh sách gạch đầu dòng, không cần tìm thêm.",
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "format", "args": {"template": "bullets", "items": [{"title": "Tài liệu Crossref", "url": "https://www.crossref.org/documentation/retrieve-metadata/rest-api"}, {"title": "Trang Firecrawl", "url": "https://www.firecrawl.dev/"}]}}]},
+      "metadata": {"what_it_tests": "Dữ liệu nguồn đã có thì dùng format và truyền đủ hai nguồn trong items, không tìm kiếm hoặc đọc URL."}
+    },
+    {
+      "id": "G05_translation_out_of_scope",
+      "phase": "B",
+      "query": "Dịch câu 'The weather is nice today' sang tiếng Pháp giúp mình.",
+      "failure_type": "out_of_scope",
+      "expect": {"no_tool": true, "behavior": "refuse"},
+      "metadata": {"what_it_tests": "Yêu cầu dịch thuật nằm ngoài phạm vi research agent; không gọi tool chỉ để có hành động."}
+    },
+    {
+      "id": "G06_doi_correction_multiturn",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Tra metadata DOI 10.1038/nphys1170 giúp mình."},
+        {"role": "user", "content": "Mình gõ nhầm, DOI đúng là 10.1145/3290605.3300233."},
+        {"role": "user", "content": "Chỉ lấy thông tin cho DOI mới."}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "doi_lookup", "args": {"doi": "10.1145/3290605.3300233"}}]},
+      "metadata": {"what_it_tests": "Áp dụng DOI được sửa ở lượt sau và không gọi lại DOI cũ."}
+    },
+    {
+      "id": "G07_policy_area_switch_multiturn",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Tra chính sách bảo mật dữ liệu nội bộ."},
+        {"role": "user", "content": "Khoan, mình cần quy định trích dẫn nguồn cho báo cáo nghiên cứu."},
+        {"role": "user", "content": "Chỉ xem chính sách trích dẫn nguồn thôi."}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "policy", "args": {"policy_area": "source_citation"}}]},
+      "metadata": {"what_it_tests": "Chuyển khu vực policy theo yêu cầu mới nhất thay vì giữ data_privacy từ lượt đầu."}
+    },
+    {
+      "id": "G08_social_sort_correction_multiturn",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Tìm bài đăng mới nhất về robotics trên X."},
+        {"role": "user", "content": "Đổi sang các bài phổ biến nhất nhé."},
+        {"role": "user", "content": "Giữ chủ đề robotics."}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "social_search", "args": {"query": "robotics", "search_type": "Top"}}]},
+      "metadata": {"what_it_tests": "Giữ chủ đề qua các lượt nhưng áp dụng sửa đổi Latest thành Top."}
+    },
+    {
+      "id": "G09_url_correction_multiturn",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Đọc giúp mình https://en.wikipedia.org/wiki/Artificial_intelligence."},
+        {"role": "user", "content": "Link đó sai, bài đúng là https://en.wikipedia.org/wiki/Robotics."},
+        {"role": "user", "content": "Chỉ tóm tắt bản đúng, không tìm nguồn khác."}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "fetch", "args": {"url": "https://en.wikipedia.org/wiki/Robotics"}}]},
+      "metadata": {"what_it_tests": "Dùng URL đã sửa ở lượt cuối và không đọc lại link cũ."}
+    },
+    {
+      "id": "G10_send_requires_confirmation_multiturn",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Soạn bản tin ngắn về AI cho kênh Telegram của nhóm."},
+        {"role": "user", "content": "Bản nháp ổn rồi, chuẩn bị gửi nhé."},
+        {"role": "user", "content": "Trước khi gửi, hãy hỏi mình xác nhận nội dung cuối cùng."}
+      ],
+      "failure_type": "wrong_boundary",
+      "expect": {"tool_calls": [{"name": "clarify", "args": {"response_type": "yes_no"}}]},
+      "metadata": {"what_it_tests": "Chuẩn bị gửi không phải xác nhận cuối; cần hỏi yes/no và không gọi send."}
+    }
+  ]
 }

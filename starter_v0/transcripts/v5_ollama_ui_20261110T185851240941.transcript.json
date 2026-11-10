@@ -1,0 +1,31 @@
+{
+  "transcript_id": "v5_ollama_ui_20261110T185851240941",
+  "version": "v5",
+  "artifact_version": "v5+pa1ca32f6dff8+tf073692ef964",
+  "prompt_hash": "a1ca32f6dff84739809d018d40bea28bbcdda578e8d4dfaf52db7fce0a1028f3",
+  "tools_hash": "f073692ef964c687dfbe6d684bcd95bc649fcfa53ab85ab6ed7cb8d817c4edb0",
+  "provider": "ollama",
+  "model": "qwen3:1.7b",
+  "source": "streamlit_ui",
+  "created_at": "2026-11-10T18:58:51",
+  "turns": [
+    {
+      "turn_index": 1,
+      "started_at": "2026-11-10T18:58:51",
+      "user": "What can you do?",
+      "status": "answered",
+      "assistant_text": "I can assist with various tasks such as:\n\n1. **Looking up information** on the web (e.g., news, research papers, articles).\n2. **Finding tweets** from a specific user or topic.\n3. **Searching for social media posts** (e.g., X/Twitter) based on keywords or topics.\n4. **Looking up metadata** for a specific DOI or URL.\n5. **Formatting collected information** into a digest.\n6. **Sending text** to Telegram after confirming with the user.\n7. **Policy information** related to AI usage, data privacy, and publishing.\n\nLet me know if you'd like to perform any of these tasks!",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": "I can assist with various tasks such as:\n\n1. **Looking up information** on the web (e.g., news, research papers, articles).\n2. **Finding tweets** from a specific user or topic.\n3. **Searching for social media posts** (e.g., X/Twitter) based on keywords or topics.\n4. **Looking up metadata** for a specific DOI or URL.\n5. **Formatting collected information** into a digest.\n6. **Sending text** to Telegram after confirming with the user.\n7. **Policy information** related to AI usage, data privacy, and publishing.\n\nLet me know if you'd like to perform any of these tasks!",
+          "tool_calls": [],
+          "tool_results": []
+        }
+      ],
+      "tool_events": [],
+      "ended_at": "2026-11-10T18:58:57"
+    }
+  ],
+  "updated_at": "2026-11-10T18:58:57"
+}

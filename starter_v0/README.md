@@ -9,3 +9,31 @@ Toàn bộ source code của lab nằm trong folder này. Chạy mọi lệnh t�
 - File học viên được sửa: `artifacts/system_prompt.md`, `artifacts/tools.yaml`, `artifacts/version_log.csv`, `data/eval_group.json`, `tools/` (thêm tool mới và đăng ký trong `tools/__init__.py`), `tests/test_tools_todo.py`, code UI và `requirements.txt`. Không sửa nội dung case trong `data/eval_base.json`.
 
 Chi tiết từng bước xem [README.md](../README.md) ở root; cấu hình API key xem [docs/TOOL-SETUP.md](../docs/TOOL-SETUP.md).
+
+## Demo UI
+
+Từ thư mục `starter_v0/` sau khi cài `requirements.txt` và cấu hình `.env`:
+
+```powershell
+python -m streamlit run app.py --server.headless=true
+```
+
+Mở `http://localhost:8501`. UI dùng provider `ollama` theo mặc định và lấy model từ
+`OLLAMA_MODEL`; có thể đặt `DEMO_PROVIDER` để chọn provider khác. Mỗi phiên UI lưu
+transcript JSON trong `transcripts/` và có nút tải transcript. Nội dung Telegram
+chỉ được gửi sau khi người dùng bấm xác nhận ngay trong UI.
+
+Để nhóm khác mở từ xa, giữ UI đang chạy và mở terminal thứ hai:
+
+```powershell
+cloudflared tunnel --url http://localhost:8501
+```
+
+Trên máy demo hiện tại, binary được tải vào `%TEMP%` nên có thể chạy:
+
+```powershell
+& (Join-Path $env:TEMP 'research-agent-cloudflared.exe') tunnel --url http://localhost:8501
+```
+
+Chia sẻ URL `trycloudflare.com` được in ra. Đây là link tạm thời; nếu dừng tunnel
+hoặc UI thì link ngừng hoạt động và lần mở sau có URL khác.
