@@ -8,7 +8,7 @@
 
 ## 1. Thông tin nhóm
 
-- Tên nhóm: 
+- Tên nhóm: Tuesday
 - Thành viên và phân công: xem [TEAM.md](../../TEAM.md)
 - Provider/model dùng cho v0–v5: Ollama-compatible API, `qwen3:1.7b`.
 
@@ -168,7 +168,9 @@ Nhóm chỉ có run cho một model local `qwen3:1.7b` (Ollama), chưa có run c
 
 ## 6. Tổng hợp đóng góp
 
-- Mai Danh Hiếu: các commit `0fa6e99`, `3af0bde`–`cc189bb`, `79023a9`, `aebc519` ghi nhận baseline, các vòng tối ưu, tool/eval và UI; xem `report/team/2A202603948_MaiDanhHieu.md`.
+- Mai Danh Hiếu: các commit `0fa6e99`, `3af0bde`–`cc189bb` ghi nhận baseline, các vòng tối ưu, tool, xem `report/team/2A202603948_MaiDanhHieu.md`.
+- Đặng Quang Duy: các commit `064fe9c`, `b6e2a34`, `555c6ff` - chạy baseline, viết eval, test tool, chat live, xem `report/team/2A202603984_DangQuangDuy.md`.
+- Bùi Thị Huyền Tâm: viết báo cáo
 - Các thành viên khác sẽ tự bổ sung thông tin, báo cáo cá nhân và đối chiếu commit kỹ thuật trong [TEAM.md](../../TEAM.md) trước khi nộp.
 
 ## 7. Hạn chế và hướng cải thiện — B6. Reflection
